@@ -1,0 +1,40 @@
+import package ;
+
+project
+    : requirements <include>. <linkflags>-rdynamic
+    ;
+
+explicit test ;
+
+alias common-flags
+    :
+    :
+    :
+    : <cxxflags>-Wall <cxxflags>-Wextra <cxxflags>-Werror <cxxflags>-ansi
+      <cxxflags>-pedantic-errors
+    ;
+
+alias profile-flags
+    :
+    :
+    :
+    : <cxxflags>-p <linkflags>-p
+      <cxxflags>-fprofile-arcs <linkflags>-fprofile-arcs
+      <cxxflags>-ftest-coverage
+      <optimization>off
+    ;
+
+alias flags : common-flags ;
+alias flags : common-flags profile-flags : <variant>profile ;
+
+lib backtrace
+    : backtrace.cpp helpers.cpp record.cpp flags
+    ;
+
+package.install dist
+    : <install-header-subdir>reinvented-wheels
+    :
+    : backtrace
+    : backtrace.hpp record.hpp
+    ;
+

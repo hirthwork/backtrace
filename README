@@ -1,0 +1,32 @@
+Backtrace helper library
+========================
+
+Introduction
+------------
+The purpose of this library is to provide easy way to current program call
+stack.
+
+Rationale
+---------
+This library provides ability to retrieve current call stack with function
+demangling and "backtrace_symbols" strings parsing, so you can store this
+information in exception object.
+
+Overview
+--------
+The only thing you need to use backtrace helper is to include `backtrace.hpp`
+and link libbacktrace.so. After that you can retrieve current call stack by
+calling function `GetBacktrace`.
+
+Installation
+------------
+You require bjam (a.k.a. boost build) to install this package.
+In order to launch sanity test you need Boost.Test to be installed.
+
+  * In order to install, execute bjam with argument
+    `dist --includedir=<prefix>`, where `<prefix>` is the installation path
+    where library will be installed. More precisely, `reinvented-wheels`
+    subfolder will be created, containing all required headers.
+  * In order to launch the test, execute bjam with `-d0 test release` argument
+    and ensure that return code was 0.
+

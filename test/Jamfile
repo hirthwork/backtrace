@@ -1,0 +1,32 @@
+import testing ;
+
+lib boost_unit_test_framework
+    :
+    : <threading>single
+    ;
+
+lib boost_unit_test_framework
+    :
+    : <name>boost_unit_test_framework-mt <threading>multi
+    ;
+
+lib boost_test_exec_monitor
+    :
+    : <threading>single
+    ;
+
+lib boost_test_exec_monitor
+    :
+    : <name>boost_test_exec_monitor-mt <threading>multi
+    ;
+
+compile helpers-double-inclusion.cpp ;
+
+compile record-double-inclusion.cpp ;
+run test-record.cpp ..//backtrace
+    boost_unit_test_framework boost_test_exec_monitor ;
+
+compile backtrace-double-inclusion.cpp ;
+run test-backtrace.cpp ..//backtrace
+    boost_unit_test_framework boost_test_exec_monitor ;
+
