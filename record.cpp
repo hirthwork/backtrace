@@ -113,11 +113,11 @@ NReinventedWheels::TBacktraceRecord NReinventedWheels::ParseBacktraceRecord(
         // step over the bracket
         ++openingBracket;
         int status;
-        std::string functionName(record.c_str() + openingBracket,
+        result.Symbol_ = std::string(record.c_str() + openingBracket,
             plus - openingBracket);
-        TMallocedString demangledName(
-            abi::__cxa_demangle(functionName.c_str(), NULL, NULL, &status));
-        result.Function_ = status ? functionName : demangledName.c_str();
+        TMallocedString demangledName(abi::__cxa_demangle(
+            result.Symbol_.c_str(), NULL, NULL, &status));
+        result.Function_ = status ? result.Symbol_ : demangledName.c_str();
         // step over the plus sign
         ++plus;
         assert(record[plus] == '0');

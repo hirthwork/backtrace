@@ -28,6 +28,8 @@ namespace NReinventedWheels
     {
         std::string Module_;
         // empty string indicates symbol information absence
+        std::string Symbol_;
+        // same as Symbol_ if demangling failed
         std::string Function_;
         // TODO: is this really required?
         unsigned Offset_;

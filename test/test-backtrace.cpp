@@ -55,3 +55,5 @@ BOOST_AUTO_TEST_CASE(backtrace_size)
     BOOST_REQUIRE_EQUAL(GetStackDepth(), GetBacktrace().size());
 }
 
+// TODO: moar test
+
