@@ -36,7 +36,10 @@ namespace NReinventedWheels
         const void* Address_;
     };
 
-    TBacktraceRecord ParseBacktraceRecord(const std::string& record);
+    // this function is not intended to perform full record validation
+    // exception will be thrown only if even incorrect parsing isn't possible
+    TBacktraceRecord ParseBacktraceRecord(const std::string& record,
+        bool demangle = true);
 }
 
 #endif

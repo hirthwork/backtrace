@@ -17,13 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <cassert>
 #include <cstring>
 #include <ios>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 
 #include <cxxabi.h>
+
+#include "record.h"
 
 #include "helpers.hpp"
 #include "record.hpp"
@@ -75,67 +77,71 @@ static THexParser ParseHex(const char* string, size_t length)
 }*/
 
 // input string should have one of the two forms:
-// ./prog [0x8048871]
+// ./prog() [0x8048871]
 // ./prog(myfunc+0x21) [0x8048894]
 // /usr/bin/test-backtrace() [0x8080e43]
+// /tmp/hello[(+)]()+(+)()(_ZN1ApLEi+0x1a) [0x8048bcc]
+// /tmp/hello[(+)]()+(+)()() [0x8048a8c]
+//
 NReinventedWheels::TBacktraceRecord NReinventedWheels::ParseBacktraceRecord(
-    const std::string& record)
+    const std::string& record, bool demangle)
 {
-    TBacktraceRecord result;
-    size_t openingBracket = record.find('(');
-    size_t space;
-    if (openingBracket == record.npos)
+    if (record.size() < 9)
     {
-        space = record.find(' ');
-        assert(space != record.npos);
-        result.Module_ = std::string(record.c_str(), space);
+        throw std::invalid_argument("line is too short: " + record);
     }
-    else if (record[openingBracket + 1] == ')')
-    {
-        space = openingBracket + 2;
-        result.Module_ = std::string(record.c_str(), openingBracket);
-    }
-    else
-    {
-        result.Module_ = std::string(record.c_str(), openingBracket);
-        // the minimal statement in brackets should looks like
-        // (a+0xb)
-        // 0123456 <- offsets from opening bracket
-        // maximum offset representation length should be not greater that 18
-        size_t closingBracket = record.find(')');
-        assert(closingBracket != record.npos);
-        assert(closingBracket - openingBracket >= 6);
-        size_t plus = record.find('+');
-        assert(plus != record.npos);
-        assert(plus - openingBracket >= 2);
-        assert(closingBracket - plus >= 4);
-        assert(closingBracket - plus <= 18 + 1);
-        // step over the bracket
-        ++openingBracket;
-        int status;
-        result.Symbol_ = std::string(record.c_str() + openingBracket,
-            plus - openingBracket);
-        TMallocedString demangledName(abi::__cxa_demangle(
-            result.Symbol_.c_str(), NULL, NULL, &status));
-        result.Function_ = status ? result.Symbol_ : demangledName.c_str();
-        // step over the plus sign
-        ++plus;
-        assert(record[plus] == '0');
-        assert(record[plus + 1] == 'x');
-        result.Offset_ =
-            ParseHex(record.c_str() + plus, closingBracket - plus);
-        space = closingBracket + 1;
-    }
-    assert(record[space] == ' ');
 
-    // step over the space
-    ++space;
-    assert(record[space] == '[');
-    // step over the bracket
-    ++space;
-    size_t closingBracket = record.find(']');
-    assert(closingBracket != record.npos);
-    result.Address_ = ParseHex<void*>(record.c_str() + space, closingBracket - space);
+    TBacktraceRecord result;
+    size_t squareBracket = record.rfind('[', record.size() - 5);
+    if (squareBracket == record.npos || squareBracket < 4)
+    {
+        throw std::invalid_argument(
+            "no suitable opening square bracket found in backtrace string: "
+            + record);
+    }
+
+    result.Address_ = ParseHex<void*>(record.c_str() + squareBracket + 3,
+        record.size() - squareBracket - 4);
+    size_t bracket = record.rfind('(', squareBracket - 3);
+    if (bracket == record.npos || !bracket)
+    {
+        throw std::invalid_argument(
+            "no suitable opening bracket found in backtrace string: "
+            + record);
+    }
+
+    if (bracket < squareBracket - 3)
+    {
+        size_t plus = record.find('+', bracket + 2);
+        if (plus == record.npos || plus + 6 > squareBracket)
+        {
+            throw std::invalid_argument(
+                "no plus sign found in backtrace string: " + record);
+        }
+        result.Symbol_ = std::string(record, bracket + 1, plus - bracket - 1);
+        if (demangle) {
+            int status;
+            TMallocedString demangledName(abi::__cxa_demangle(
+                result.Symbol_.c_str(), NULL, NULL, &status));
+            result.Function_ =
+                status ? result.Symbol_ : demangledName.c_str();
+        }
+        result.Offset_ = ParseHex(record.c_str() + plus + 3,
+            squareBracket - plus - 5);
+    }
+    result.Module_ = std::string(record.c_str(), bracket);
     return result;
+}
+
+TBacktraceRecord* ParseBacktraceRecord(const char* record)
+{
+    try {
+        return ConvertToCRecord(
+            NReinventedWheels::ParseBacktraceRecord(record));
+    }
+    catch (...)
+    {
+        return NULL;
+    }
 }
 

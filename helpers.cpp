@@ -19,57 +19,93 @@
 
 #include <cassert>
 #include <cstdlib>
+#include <cstring>
 
 #include "helpers.hpp"
 
-namespace NReinventedWheels
+TMallocedString::TMallocedString(char* string)
+    : String_(string)
 {
-    TMallocedString::TMallocedString(char* string)
-        : String_(string)
-    {
-    }
+}
 
-    TMallocedString::~TMallocedString()
-    {
-        free(String_);
-    }
+TMallocedString::~TMallocedString()
+{
+    free(String_);
+}
 
-    char* TMallocedString::c_str() const
-    {
-        assert(String_);
-        return String_;
-    }
+char* TMallocedString::c_str() const
+{
+    assert(String_);
+    return String_;
+}
 
-    TMallocedData::TMallocedData(void* data)
-        : Data_(data)
-    {
-    }
+TMallocedData::TMallocedData(void* data)
+    : Data_(data)
+{
+}
 
-    TMallocedData::~TMallocedData()
-    {
-        free(Data_);
-    }
+TMallocedData::~TMallocedData()
+{
+    free(Data_);
+}
 
-    void* TMallocedData::Data() const
-    {
-        assert(Data_);
-        return Data_;
-    }
+void* TMallocedData::Data() const
+{
+    return Data_;
+}
 
-    TMallocedStringsArray::TMallocedStringsArray(char** strings)
-        : Strings_(strings)
-    {
-    }
+void* TMallocedData::Release()
+{
+    void* result = Data_;
+    Data_ = NULL;
+    return result;
+}
 
-    TMallocedStringsArray::~TMallocedStringsArray()
-    {
-        free(Strings_);
-    }
+TMallocedStringsArray::TMallocedStringsArray(char** strings)
+    : Strings_(strings)
+{
+}
 
-    char* TMallocedStringsArray::operator[](unsigned pos) const
+TMallocedStringsArray::~TMallocedStringsArray()
+{
+    free(Strings_);
+}
+
+char* TMallocedStringsArray::operator[](size_t pos) const
+{
+    assert(Strings_);
+    return Strings_[pos];
+}
+
+size_t SizeOfCRecord(const NReinventedWheels::TBacktraceRecord& record)
+{
+    return sizeof(TBacktraceRecord)
+        + record.Module_.size() + 1
+        + record.Symbol_.size() + 1;
+}
+
+char* ConvertToCRecord(const NReinventedWheels::TBacktraceRecord& input,
+    TBacktraceRecord* output, char* strings)
+{
+    output->Module_ = strings;
+    strcpy(strings, input.Module_.c_str());
+    strings += input.Module_.size() + 1;
+    output->Symbol_ = strings;
+    strcpy(strings, input.Symbol_.c_str());
+    output->Offset_ = input.Offset_;
+    output->Address_ = input.Address_;
+    return strings + input.Symbol_.size() + 1;
+}
+
+TBacktraceRecord* ConvertToCRecord(
+    const NReinventedWheels::TBacktraceRecord& input)
+{
+    TBacktraceRecord* output =
+        reinterpret_cast<TBacktraceRecord*>(malloc(SizeOfCRecord(input)));
+    if (output)
     {
-        assert(Strings_);
-        return Strings_[pos];
+        ConvertToCRecord(input, output, reinterpret_cast<char*>(output + 1));
     }
+    return output;
 }
 

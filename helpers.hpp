@@ -20,38 +20,53 @@
 #ifndef __HELPERS_HPP_2011_09_20__
 #define __HELPERS_HPP_2011_09_20__
 
-namespace NReinventedWheels
+#include <cstddef>
+
+#include "record.h"
+#include "record.hpp"
+
+class TMallocedString
 {
-    class TMallocedString
-    {
-        char* const String_;
+    char* const String_;
 
-    public:
-        TMallocedString(char* string);
-        ~TMallocedString();
-        char* c_str() const;
-    };
+public:
+    TMallocedString(char* string);
+    ~TMallocedString();
+    char* c_str() const;
+};
 
-    class TMallocedData
-    {
-        void* const Data_;
+class TMallocedData
+{
+    void* Data_;
 
-    public:
-        TMallocedData(void* data);
-        ~TMallocedData();
-        void* Data() const;
-    };
+public:
+    TMallocedData(void* data);
+    ~TMallocedData();
+    void* Data() const;
+    void* Release();
+};
 
-    class TMallocedStringsArray
-    {
-        char** const Strings_;
+class TMallocedStringsArray
+{
+    char** const Strings_;
 
-    public:
-        TMallocedStringsArray(char** strings);
-        ~TMallocedStringsArray();
-        char* operator[](unsigned pos) const;
-    };
-}
+public:
+    TMallocedStringsArray(char** strings);
+    ~TMallocedStringsArray();
+    char* operator[](size_t pos) const;
+};
+
+// returns size need to allocate for ::TBacktraceRecord to store this one
+size_t SizeOfCRecord(const NReinventedWheels::TBacktraceRecord& record);
+
+// converts input record to preallocated C-one placing all strings to
+// 'strings' buffer and returning the pointer to first non-modified character
+char* ConvertToCRecord(const NReinventedWheels::TBacktraceRecord& input,
+    TBacktraceRecord* output, char* strings);
+
+// converts input record to C-one with memory allocation using malloc function
+TBacktraceRecord* ConvertToCRecord(
+    const NReinventedWheels::TBacktraceRecord& input);
 
 #endif
 

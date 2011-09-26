@@ -5,6 +5,7 @@ project
     ;
 
 explicit test ;
+explicit coverage ;
 
 alias common-flags
     :
@@ -14,27 +15,24 @@ alias common-flags
       <cxxflags>-pedantic-errors
     ;
 
-alias profile-flags
+alias coverage-flags
     :
     :
     :
     : <cxxflags>-p <linkflags>-p
       <cxxflags>-fprofile-arcs <linkflags>-fprofile-arcs
       <cxxflags>-ftest-coverage
-      <optimization>off
     ;
 
-alias flags : common-flags ;
-alias flags : common-flags profile-flags : <variant>profile ;
+alias backtrace-core : backtrace.cpp helpers.cpp record.cpp common-flags ;
 
-lib backtrace
-    : backtrace.cpp helpers.cpp record.cpp flags
-    ;
+lib backtrace : backtrace-core ;
+lib coverage : backtrace-core coverage-flags ;
 
 package.install dist
     : <install-header-subdir>reinvented-wheels
     :
     : backtrace
-    : backtrace.hpp record.hpp
+    : backtrace.h backtrace.hpp record.h record.hpp
     ;
 

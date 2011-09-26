@@ -20,13 +20,14 @@ lib boost_test_exec_monitor
     : <name>boost_test_exec_monitor-mt <threading>multi
     ;
 
+alias boost_test : boost_unit_test_framework boost_test_exec_monitor ;
+
 compile helpers-double-inclusion.cpp ;
+run test-helpers.cpp ..//coverage boost_test ;
 
 compile record-double-inclusion.cpp ;
-run test-record.cpp ..//backtrace
-    boost_unit_test_framework boost_test_exec_monitor ;
+run test-record.cpp ..//coverage boost_test ;
 
 compile backtrace-double-inclusion.cpp ;
-run test-backtrace.cpp ..//backtrace
-    boost_unit_test_framework boost_test_exec_monitor ;
+run test-backtrace.cpp ..//coverage boost_test ;
 

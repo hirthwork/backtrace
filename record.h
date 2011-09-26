@@ -1,5 +1,5 @@
 /*
- * backtrace.hpp            -- backtrace helper
+ * record.h                 -- backtrace_symbols parsing C interface
  *
  * Copyright (C) 2011 Dmitry Potapov <potapov.d@gmail.com>
  *
@@ -17,21 +17,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __BACKTRACE_HPP_2011_09_20__
-#define __BACKTRACE_HPP_2011_09_20__
+#ifndef __RECORD_H_2011_09_24__
+#define __RECORD_H_2011_09_24__
 
-#include <vector>
-
-#include "record.hpp"
-
-namespace NReinventedWheels
+struct TBacktraceRecord
 {
-    TBacktraceRecord GetCurrentFrame(unsigned offset = 0,
-        bool demangle = true);
-    int GetStackDepth(int initialDepth = 10);
-    typedef std::vector<TBacktraceRecord> TBacktrace;
-    TBacktrace GetBacktrace(unsigned offset = 0, bool demangle = true);
-}
+    const char* Module_;
+    // empty string indicates symbol information absence
+    const char* Symbol_;
+    // TODO: is this really required?
+    unsigned Offset_;
+    const void* Address_;
+};
+
+#ifdef  __cplusplus
+extern "C"
+#endif
+// returns pointer to malloced object, NULL on failure
+struct TBacktraceRecord* ParseBacktraceRecord(const char* record);
 
 #endif
 

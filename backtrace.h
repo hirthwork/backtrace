@@ -1,5 +1,5 @@
 /*
- * backtrace.hpp            -- backtrace helper
+ * backtrace.h              -- backtrace helper C interface
  *
  * Copyright (C) 2011 Dmitry Potapov <potapov.d@gmail.com>
  *
@@ -17,21 +17,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __BACKTRACE_HPP_2011_09_20__
-#define __BACKTRACE_HPP_2011_09_20__
+#ifndef __BACKTRACE_H_2011_09_24__
+#define __BACKTRACE_H_2011_09_24__
 
-#include <vector>
+#include "record.h"
 
-#include "record.hpp"
+#ifdef  __cplusplus
+extern "C" {
+#endif
 
-namespace NReinventedWheels
-{
-    TBacktraceRecord GetCurrentFrame(unsigned offset = 0,
-        bool demangle = true);
-    int GetStackDepth(int initialDepth = 10);
-    typedef std::vector<TBacktraceRecord> TBacktrace;
-    TBacktrace GetBacktrace(unsigned offset = 0, bool demangle = true);
+extern struct TBacktraceRecord* GetCurrentFrame(unsigned offset);
+extern int GetStackDepth(int initialDepth);
+// returns malloced NULL-terminated array of records, NULL on failure
+extern struct TBacktraceRecord** GetBacktrace(unsigned offset);
+
+#ifdef  __cplusplus
 }
+#endif
 
 #endif
 
