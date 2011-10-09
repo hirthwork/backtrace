@@ -32,9 +32,8 @@ compile helpers-double-inclusion.cpp ;
 
 compile backtrace-double-inclusion-c.c ;
 compile backtrace-double-inclusion.cpp ;
-run test-backtrace.cpp ..//coverage boost_test : <runtime-link>shared ;
-run test-backtrace-c.c ..//coverage : <runtime-link>shared ;
-#run test-backtrace-static.cpp ..//coverage boost_test : <runtime-link>static ;
+run test-backtrace-c.c ..//coverage ;
+run test-backtrace.cpp ..//coverage boost_test ;
 
 compile record-double-inclusion-c.c ;
 compile record-double-inclusion.cpp ;
