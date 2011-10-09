@@ -39,3 +39,9 @@ compile record-double-inclusion-c.c ;
 compile record-double-inclusion.cpp ;
 run test-record.cpp ..//coverage boost_test ;
 
+compile malloced-explicit-good.cpp ;
+compile-fail malloced-explicit-bad.cpp ;
+
+compile demangled-explicit-good.cpp ;
+compile-fail demangled-explicit-bad.cpp ;
+
