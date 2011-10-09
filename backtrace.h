@@ -26,10 +26,12 @@
 extern "C" {
 #endif
 
-extern struct TBacktraceRecord* GetCurrentFrame(unsigned offset);
-extern int GetStackDepth(int initialDepth);
-// returns malloced NULL-terminated array of records, NULL on failure
-extern struct TBacktraceRecord** GetBacktrace(unsigned offset);
+/* returns zero on failure, non-zero on success */
+extern int GetCurrentFrame(TBacktraceRecord* record, int offset);
+
+/* returns NULL on failure */
+extern TBacktraceRecord* GetBacktrace(int* size, int offset,
+    int initialDepth);
 
 #ifdef  __cplusplus
 }

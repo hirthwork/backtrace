@@ -19,36 +19,51 @@
 
 #include <execinfo.h>
 
+#include <cstddef>
 #include <cstdlib>
 
+#include <new>
+#include <stdexcept>
+
 #include "backtrace.h"
+#include "extract.h"
 #include "record.h"
 
 #include "backtrace.hpp"
 #include "helpers.hpp"
 #include "record.hpp"
 
-NReinventedWheels::TBacktraceRecord NReinventedWheels::GetCurrentFrame(
-    unsigned offset, bool demangle)
+int GetCurrentFrame(TBacktraceRecord* record, int offset)
 {
-    int count = offset + 2;
-    TMallocedData frames(calloc(count, sizeof(void*)));
-    int size = backtrace(static_cast<void**>(frames.Data()), count);
-    TMallocedStringsArray strings(
-        backtrace_symbols(static_cast<void**>(frames.Data()), size));
-    return ParseBacktraceRecord(strings[size - 1], demangle);
+    offset += 2;
+    TMalloced frames(calloc(offset, sizeof(void*)));
+    if(frames.Data())
+    {
+        int size = backtrace(static_cast<void**>(frames.Data()), offset);
+        if(size == offset)
+        {
+            *record = ExtractBacktraceRecord(
+                static_cast<void**>(frames.Data())[offset - 1]);
+            return 1;
+        }
+    }
+    return 0;
 }
 
-int NReinventedWheels::GetStackDepth(int initialDepth)
+static void* GetFrames(int& size, int initialDepth)
 {
     while (true)
     {
-        TMallocedData frames(calloc(initialDepth, sizeof(void*)));
-        int size =
-            backtrace(static_cast<void**>(frames.Data()), initialDepth);
-        if (size < initialDepth)
+        TMalloced frames(calloc(initialDepth, sizeof(void*)));
+        if(!frames.Data())
         {
-            return size - 1;
+            return NULL;
+        }
+
+        size = backtrace(static_cast<void**>(frames.Data()), initialDepth);
+        if(size < initialDepth)
+        {
+            return frames.Release();
         }
         else
         {
@@ -57,60 +72,52 @@ int NReinventedWheels::GetStackDepth(int initialDepth)
     }
 }
 
-NReinventedWheels::TBacktrace NReinventedWheels::GetBacktrace(unsigned offset,
-    bool demangle)
+NReinventedWheels::TBacktrace NReinventedWheels::GetBacktrace(int offset,
+    int initialDepth)
 {
-    int depth = GetStackDepth();
-    TMallocedData frames(calloc(depth, sizeof(void*)));
-    int size = backtrace(static_cast<void**>(frames.Data()), depth);
-    TMallocedStringsArray strings(
-        backtrace_symbols(static_cast<void**>(frames.Data()), size));
-    TBacktrace backtrace;
-    for (int i = offset + 1; i < size; ++i)
+    int size;
+    TMalloced frames(GetFrames(size, initialDepth + 2));
+    if(!frames.Data())
     {
-        backtrace.push_back(ParseBacktraceRecord(strings[i], demangle));
-    }
-    return backtrace;
-}
-
-TBacktraceRecord* GetCurrentFrame(unsigned offset)
-{
-    return ConvertToCRecord(
-        NReinventedWheels::GetCurrentFrame(offset + 1, false));
-}
-
-int GetStackDepth(int initialDepth)
-{
-    return NReinventedWheels::GetStackDepth(initialDepth + 1) - 1;
-}
-
-TBacktraceRecord** GetBacktrace(unsigned offset)
-{
-    NReinventedWheels::TBacktrace backtrace =
-        NReinventedWheels::GetBacktrace(offset + 1, false);
-    size_t size = (backtrace.size() + 1) * sizeof(TBacktraceRecord*);
-    for (NReinventedWheels::TBacktrace::const_iterator iter =
-        backtrace.begin(), end = backtrace.end(); iter != end; ++iter)
-    {
-        size += SizeOfCRecord(*iter);
+        throw std::bad_alloc();
     }
 
-    TMallocedData result(malloc(size));
-    if (result.Data())
+    if(size <= offset + 2)
     {
-        TBacktraceRecord** pointers =
-            reinterpret_cast<TBacktraceRecord**>(result.Data());
-        pointers[backtrace.size()] = NULL;
-        TBacktraceRecord* data = reinterpret_cast<TBacktraceRecord*>(
-            pointers + backtrace.size() + 1);
-        char* strings = reinterpret_cast<char*>(data + backtrace.size());
-        for (NReinventedWheels::TBacktrace::const_iterator iter =
-            backtrace.begin(), end = backtrace.end(); iter != end; ++iter)
-        {
-            *pointers++ = data;
-            strings = ConvertToCRecord(*iter, data++, strings);
-        }
+        throw std::logic_error("offset is bigger that call stack depth");
     }
-    return reinterpret_cast<TBacktraceRecord**>(result.Release());
+
+    TBacktrace result(size - offset - 2);
+    for (int i = offset + 2, j = 0; i < size; ++i, ++j)
+    {
+        result[j] =
+            ExtractBacktraceRecord(static_cast<void**>(frames.Data())[i]);
+    }
+    return result;
+}
+
+TBacktraceRecord* GetBacktrace(int* size, int offset, int initialDepth)
+{
+    TMalloced frames(GetFrames(*size, initialDepth + 2));
+    if(!frames.Data() || *size <= offset + 2)
+    {
+        return NULL;
+    }
+
+    TMalloced result(calloc(*size - offset - 2,
+        sizeof(TBacktraceRecord)));
+    if(!result.Data())
+    {
+        return NULL;
+    }
+
+    TBacktraceRecord* iter = static_cast<TBacktraceRecord*>(result.Data());
+    for (int i = offset + 2; i < *size; ++i, ++iter)
+    {
+        *iter = ExtractBacktraceRecord(static_cast<void**>(frames.Data())[i]);
+    }
+    *size -= offset + 2;
+
+    return reinterpret_cast<TBacktraceRecord*>(result.Release());
 }
 

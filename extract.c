@@ -1,5 +1,5 @@
 /*
- * record.h                 -- backtrace information atom
+ * extract.c                -- backtrace information extracting routine
  *
  * Copyright (C) 2011 Dmitry Potapov <potapov.d@gmail.com>
  *
@@ -17,16 +17,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RECORD_H_2011_09_24__
-#define __RECORD_H_2011_09_24__
+#include <dlfcn.h>
 
-typedef struct
+#include "extract.h"
+
+TBacktraceRecord ExtractBacktraceRecord(void* frame)
 {
-    /* NULL indicates error during record extraction */
-    const char* Module_;
-    /* NULL indicates symbol information absence */
-    const char* Symbol_;
-} TBacktraceRecord;
-
-#endif
+    Dl_info info;
+    TBacktraceRecord record = {0, 0};
+    if(frame && dladdr(frame, &info))
+    {
+        record.Module_ = info.dli_fname;
+        record.Symbol_ = info.dli_sname;
+    }
+    else
+    {
+        record.Module_ = 0;
+        record.Symbol_ = 0;
+    }
+    return record;
+}
 

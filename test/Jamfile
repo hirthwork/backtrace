@@ -22,12 +22,21 @@ lib boost_test_exec_monitor
 
 alias boost_test : boost_unit_test_framework boost_test_exec_monitor ;
 
-compile helpers-double-inclusion.cpp ;
-run test-helpers.cpp ..//coverage boost_test ;
+compile demangle-double-inclusion.cpp ;
+run test-demangle.cpp ..//coverage boost_test ;
 
+compile extract-double-inclusion.c ;
+run test-extract.c ..//coverage ;
+
+compile helpers-double-inclusion.cpp ;
+
+compile backtrace-double-inclusion-c.c ;
+compile backtrace-double-inclusion.cpp ;
+run test-backtrace.cpp ..//coverage boost_test : <runtime-link>shared ;
+run test-backtrace-c.c ..//coverage : <runtime-link>shared ;
+#run test-backtrace-static.cpp ..//coverage boost_test : <runtime-link>static ;
+
+compile record-double-inclusion-c.c ;
 compile record-double-inclusion.cpp ;
 run test-record.cpp ..//coverage boost_test ;
-
-compile backtrace-double-inclusion.cpp ;
-run test-backtrace.cpp ..//coverage boost_test ;
 

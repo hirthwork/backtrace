@@ -1,5 +1,5 @@
 /*
- * record.h                 -- backtrace information atom
+ * demangle.cpp             -- symbol demangling helper
  *
  * Copyright (C) 2011 Dmitry Potapov <potapov.d@gmail.com>
  *
@@ -17,16 +17,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RECORD_H_2011_09_24__
-#define __RECORD_H_2011_09_24__
+#include <cxxabi.h>
 
-typedef struct
+#include <string>
+
+#include "demangle.hpp"
+#include "helpers.hpp"
+
+std::string NReinventedWheels::Demangle(const char* symbol)
 {
-    /* NULL indicates error during record extraction */
-    const char* Module_;
-    /* NULL indicates symbol information absence */
-    const char* Symbol_;
-} TBacktraceRecord;
+    if(!symbol)
+    {
+        return std::string();
+    }
 
-#endif
+    int status;
+    TMalloced demangled(
+        abi::__cxa_demangle(symbol, NULL, NULL, &status));
+    return status ? symbol : static_cast<const char*>(demangled.Data());
+}
 

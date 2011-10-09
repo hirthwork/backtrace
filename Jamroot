@@ -4,35 +4,51 @@ project
     : requirements <include>. <linkflags>-rdynamic
     ;
 
-explicit test ;
-explicit coverage ;
-
 alias common-flags
     :
     :
     :
-    : <cxxflags>-Wall <cxxflags>-Wextra <cxxflags>-Werror <cxxflags>-ansi
-      <cxxflags>-pedantic-errors
+    : <cflags>-Wall <cxxflags>-Wall <cflags>-Wextra <cxxflags>-Wextra
+      <cflags>-Werror <cxxflags>-Werror <cflags>-ansi <cxxflags>-ansi
+      <cflags>-pedantic-errors <cxxflags>-pedantic-errors
     ;
 
 alias coverage-flags
     :
     :
     :
-    : <cxxflags>-p <linkflags>-p
+    : <cflags>-p <cxxflags>-p <linkflags>-p <cflags>-fprofile-arcs
       <cxxflags>-fprofile-arcs <linkflags>-fprofile-arcs
-      <cxxflags>-ftest-coverage
+      <cflags>-ftest-coverage <cxxflags>-ftest-coverage
     ;
 
-alias backtrace-core : backtrace.cpp helpers.cpp record.cpp common-flags ;
+alias extract
+    : extract.c common-flags
+    :
+    :
+    : <define>_GNU_SOURCE
+    ;
 
-lib backtrace : backtrace-core ;
-lib coverage : backtrace-core coverage-flags ;
+obj extract-object : extract ;
+obj extract-object-coverage : extract coverage-flags ;
+
+lib dl ;
+
+alias backtrace-sources
+    : backtrace.cpp demangle.cpp dl common-flags
+    ;
+
+lib backtrace : backtrace-sources extract-object ;
+lib coverage : backtrace-sources extract-object-coverage coverage-flags ;
+
+explicit test ;
+explicit coverage ;
+explicit extract-object-coverage ;
 
 package.install dist
     : <install-header-subdir>reinvented-wheels
     :
     : backtrace
-    : backtrace.h backtrace.hpp record.h record.hpp
+    : backtrace.h backtrace.hpp demangle.hpp record.h record.hpp
     ;
 

@@ -1,5 +1,5 @@
 /*
- * record.hpp               -- backtrace_symbols parsing routine
+ * record.hpp               -- demangled backtrace information atom
  *
  * Copyright (C) 2011 Dmitry Potapov <potapov.d@gmail.com>
  *
@@ -20,26 +20,32 @@
 #ifndef __RECORD_HPP_2011_09_20__
 #define __RECORD_HPP_2011_09_20__
 
+#include "record.h"
+
 #include <string>
+
+#include "demangle.hpp"
 
 namespace NReinventedWheels
 {
-    struct TBacktraceRecord
+    struct TDemangledBacktraceRecord
     {
-        std::string Module_;
-        // empty string indicates symbol information absence
-        std::string Symbol_;
-        // same as Symbol_ if demangling failed
+        // NULL indicates error during record extraction
+        const char* Module_;
+        // NULL indicates symbol information absence
+        const char* Symbol_;
+        // same as Symbol_ if demangling failed or empty string no symbol
+        // information available
         std::string Function_;
-        // TODO: is this really required?
-        unsigned Offset_;
-        const void* Address_;
-    };
 
-    // this function is not intended to perform full record validation
-    // exception will be thrown only if even incorrect parsing isn't possible
-    TBacktraceRecord ParseBacktraceRecord(const std::string& record,
-        bool demangle = true);
+        explicit inline TDemangledBacktraceRecord(
+            const TBacktraceRecord& record)
+            : Module_(record.Module_)
+            , Symbol_(record.Symbol_)
+            , Function_(Demangle(Symbol_))
+        {
+        }
+    };
 }
 
 #endif

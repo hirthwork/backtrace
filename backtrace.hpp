@@ -20,17 +20,16 @@
 #ifndef __BACKTRACE_HPP_2011_09_20__
 #define __BACKTRACE_HPP_2011_09_20__
 
+#include "record.h"
+
 #include <vector>
 
 #include "record.hpp"
 
 namespace NReinventedWheels
 {
-    TBacktraceRecord GetCurrentFrame(unsigned offset = 0,
-        bool demangle = true);
-    int GetStackDepth(int initialDepth = 10);
     typedef std::vector<TBacktraceRecord> TBacktrace;
-    TBacktrace GetBacktrace(unsigned offset = 0, bool demangle = true);
+    TBacktrace GetBacktrace(int offset = 0, int initialDepth = 10);
 }
 
 #endif

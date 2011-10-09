@@ -1,5 +1,5 @@
 /*
- * record.h                 -- backtrace information atom
+ * demangle.hpp             -- symbol demangling helper
  *
  * Copyright (C) 2011 Dmitry Potapov <potapov.d@gmail.com>
  *
@@ -17,16 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RECORD_H_2011_09_24__
-#define __RECORD_H_2011_09_24__
+#ifndef __DEMANGLE_HPP_2011_10_09__
+#define __DEMANGLE_HPP_2011_10_09__
 
-typedef struct
+#include <string>
+
+namespace NReinventedWheels
 {
-    /* NULL indicates error during record extraction */
-    const char* Module_;
-    /* NULL indicates symbol information absence */
-    const char* Symbol_;
-} TBacktraceRecord;
+    // returns symbol in case of failure or empty string if it is NULL
+    std::string Demangle(const char* symbol);
+}
 
 #endif
 

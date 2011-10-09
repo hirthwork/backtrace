@@ -1,5 +1,5 @@
 /*
- * record.h                 -- backtrace information atom
+ * test-extract.cpp         -- backtrace extraction function test
  *
  * Copyright (C) 2011 Dmitry Potapov <potapov.d@gmail.com>
  *
@@ -17,16 +17,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RECORD_H_2011_09_24__
-#define __RECORD_H_2011_09_24__
+#include <stdio.h>
 
-typedef struct
+#include <extract.h>
+
+int main()
 {
-    /* NULL indicates error during record extraction */
-    const char* Module_;
-    /* NULL indicates symbol information absence */
-    const char* Symbol_;
-} TBacktraceRecord;
+    TBacktraceRecord record = ExtractBacktraceRecord(NULL);
 
-#endif
+    if (record.Module_)
+    {
+        puts("Module_ is not null");
+        return 1;
+    }
+
+    if (record.Symbol_)
+    {
+        puts("Module_ is not null");
+        return 1;
+    }
+
+    return 0;
+}
 

@@ -17,105 +17,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <backtrace.h>
-#include <record.h>
+#include <cstring>
+
+#include <exception>
+#include <new>
+#include <stdexcept>
 
 #include <backtrace.hpp>
-#include <helpers.hpp>
-#include <record.hpp>
 
 #define BOOST_TEST_MODULE BacktraceTest
 #include <boost/test/unit_test.hpp>
 
-BOOST_AUTO_TEST_CASE(test_frame)
-{
-    NReinventedWheels::TBacktraceRecord record =
-        NReinventedWheels::GetCurrentFrame();
-    BOOST_REQUIRE_EQUAL(record.Symbol_, "_ZN10test_frame11test_methodEv");
-    BOOST_REQUIRE_EQUAL(record.Function_, "test_frame::test_method()");
-    TBacktraceRecord* plainRecord = GetCurrentFrame(0);
-    TMallocedData guard(plainRecord);
-    BOOST_REQUIRE_EQUAL(plainRecord->Symbol_,
-        "_ZN10test_frame11test_methodEv");
-}
-
-BOOST_AUTO_TEST_CASE(function_frame)
-{
-    NReinventedWheels::TBacktraceRecord record =
-        NReinventedWheels::GetCurrentFrame(-1);
-    BOOST_REQUIRE_EQUAL(record.Function_,
-        "NReinventedWheels::GetCurrentFrame(unsigned int, bool)");
-    TBacktraceRecord* plainRecord = GetCurrentFrame(-1);
-    TMallocedData guard(plainRecord);
-    BOOST_REQUIRE_EQUAL(plainRecord->Symbol_, "GetCurrentFrame");
-}
-
-BOOST_AUTO_TEST_CASE(no_demangling)
-{
-    NReinventedWheels::TBacktraceRecord record =
-        NReinventedWheels::GetCurrentFrame(-1, false);
-    BOOST_REQUIRE_EQUAL(record.Symbol_,
-        "_ZN17NReinventedWheels15GetCurrentFrameEjb");
-    BOOST_REQUIRE_EQUAL(record.Function_, "");
-
-    NReinventedWheels::TBacktrace backtrace =
-        NReinventedWheels::GetBacktrace(0, false);
-    for (NReinventedWheels::TBacktrace::const_iterator iter =
-        backtrace.begin(), end = backtrace.end(); iter != end; ++iter)
-    {
-        BOOST_REQUIRE_EQUAL(iter->Function_, "");
-    }
-}
-
-int GetDepth()
-{
-    return GetStackDepth(1);
-}
-
-BOOST_AUTO_TEST_CASE(stack_depth)
-{
-    BOOST_REQUIRE_EQUAL(NReinventedWheels::GetStackDepth(), GetDepth() - 1);
-    BOOST_REQUIRE_EQUAL(GetStackDepth(0), GetDepth() - 1);
-}
-
-BOOST_AUTO_TEST_CASE(backtrace_size)
-{
-    BOOST_REQUIRE_EQUAL(NReinventedWheels::GetStackDepth(),
-        NReinventedWheels::GetBacktrace().size());
-    BOOST_REQUIRE_EQUAL(GetStackDepth(0),
-        NReinventedWheels::GetBacktrace().size());
-}
-
 void g(int)
 {
     NReinventedWheels::TBacktrace backtrace =
-        NReinventedWheels::GetBacktrace(-1);
+        NReinventedWheels::GetBacktrace(-1, 1);
     BOOST_REQUIRE_EQUAL(backtrace[0].Symbol_,
-        "_ZN17NReinventedWheels12GetBacktraceEjb");
-    BOOST_REQUIRE_EQUAL(backtrace[0].Function_,
-        "NReinventedWheels::GetBacktrace(unsigned int, bool)");
+        "_ZN17NReinventedWheels12GetBacktraceEii");
     BOOST_REQUIRE_EQUAL(backtrace[1].Symbol_, "_Z1gi");
-    BOOST_REQUIRE_EQUAL(backtrace[1].Function_, "g(int)");
-    BOOST_REQUIRE_EQUAL(backtrace[2].Symbol_, "_Z1fv");
-    BOOST_REQUIRE_EQUAL(backtrace[2].Function_, "f()");
-
-    TBacktraceRecord** plainBacktrace = GetBacktrace(-2);
-    TMallocedData guard(plainBacktrace);
-    TBacktraceRecord** iter = plainBacktrace;
-    BOOST_REQUIRE_EQUAL((*iter++)->Symbol_,
-        "_ZN17NReinventedWheels12GetBacktraceEjb");
-    BOOST_REQUIRE_EQUAL((*iter++)->Symbol_, "GetBacktrace");
-    BOOST_REQUIRE_EQUAL((*iter++)->Symbol_, "_Z1gi");
-    BOOST_REQUIRE_EQUAL((*iter++)->Symbol_, "_Z1fv");
-    while (*iter)
-    {
-        ++iter;
-    }
-
-    BOOST_REQUIRE_EQUAL(iter - plainBacktrace, backtrace.size() + 1);
+    BOOST_REQUIRE(backtrace[2].Symbol_ == NULL);
+    BOOST_REQUIRE_EQUAL(backtrace[3].Symbol_,
+        "_ZN9backtrace11test_methodEv");
 }
 
-void f()
+static void f()
 {
     g(5);
 }
@@ -123,5 +48,35 @@ void f()
 BOOST_AUTO_TEST_CASE(backtrace)
 {
     f();
+    NReinventedWheels::TBacktrace backtrace =
+        NReinventedWheels::GetBacktrace();
+    BOOST_REQUIRE_EQUAL(backtrace[0].Symbol_,
+        "_ZN9backtrace11test_methodEv");
+}
+
+class TExceptionChecker
+{
+    const char* const Text_;
+
+public:
+    inline TExceptionChecker(const char* text)
+        : Text_(text)
+    {
+    }
+
+    bool operator () (const std::exception& exc) const
+    {
+        return strcmp(exc.what(), Text_) == 0;
+    }
+};
+
+BOOST_AUTO_TEST_CASE(error_handling)
+{
+    BOOST_REQUIRE_EXCEPTION(NReinventedWheels::GetBacktrace(100),
+        std::logic_error,
+        TExceptionChecker("offset is bigger that call stack depth"));
+    BOOST_REQUIRE_EXCEPTION(NReinventedWheels::GetBacktrace(0, 0x7fffffff),
+        std::bad_alloc,
+        TExceptionChecker("std::bad_alloc"));
 }
 
