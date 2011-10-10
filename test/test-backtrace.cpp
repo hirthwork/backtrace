@@ -48,9 +48,7 @@ static void f()
 BOOST_AUTO_TEST_CASE(backtrace)
 {
     f();
-    NReinventedWheels::TBacktrace backtrace =
-        NReinventedWheels::GetBacktrace();
-    BOOST_REQUIRE_EQUAL(backtrace[0].Symbol_,
+    BOOST_REQUIRE_EQUAL(NReinventedWheels::GetBacktrace()[0].Symbol_,
         "_ZN9backtrace11test_methodEv");
 }
 

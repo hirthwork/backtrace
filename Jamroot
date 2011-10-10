@@ -22,28 +22,17 @@ alias coverage-flags
       <cflags>-ftest-coverage <cxxflags>-ftest-coverage
     ;
 
-alias extract
-    : extract.c common-flags
-    :
-    :
-    : <define>_GNU_SOURCE
-    ;
-
-obj extract-object : extract ;
-obj extract-object-coverage : extract coverage-flags ;
-
 lib dl ;
 
 alias backtrace-sources
     : backtrace.cpp demangle.cpp dl common-flags
     ;
 
-lib backtrace : backtrace-sources extract-object ;
-lib coverage : backtrace-sources extract-object-coverage coverage-flags ;
+lib backtrace : backtrace-sources ;
+lib coverage : backtrace-sources coverage-flags ;
 
 explicit test ;
 explicit coverage ;
-explicit extract-object-coverage ;
 
 package.install dist
     : <install-header-subdir>reinvented-wheels

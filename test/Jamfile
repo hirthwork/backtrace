@@ -25,9 +25,6 @@ alias boost_test : boost_unit_test_framework boost_test_exec_monitor ;
 compile demangle-double-inclusion.cpp ;
 run test-demangle.cpp ..//coverage boost_test ;
 
-compile extract-double-inclusion.c ;
-run test-extract.c ..//coverage ;
-
 compile helpers-double-inclusion.cpp ;
 
 compile backtrace-double-inclusion-c.c ;
