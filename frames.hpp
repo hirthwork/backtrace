@@ -1,5 +1,5 @@
 /*
- * backtrace.hpp            -- backtrace helper
+ * frames.hpp               -- low-level frames extracting functions
  *
  * Copyright (C) 2011 Dmitry Potapov <potapov.d@gmail.com>
  *
@@ -17,21 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __BACKTRACE_HPP_2011_09_20__
-#define __BACKTRACE_HPP_2011_09_20__
+#ifndef __FRAMES_H_2011_09_24__
+#define __FRAMES_H_2011_09_24__
 
-#include "record.h"
+/* returns NULL on failure */
+void** GetFrames(unsigned offset, unsigned initialDepth, int* size);
 
-#include <vector>
-
-#include "record.hpp"
-
-namespace NReinventedWheels
-{
-    TBacktraceRecord GetCurrentFrame(int offset = 0);
-    typedef std::vector<TBacktraceRecord> TBacktrace;
-    TBacktrace GetBacktrace(int offset = 0, int initialDepth = 10);
-}
+/* returns NULL on failure */
+void* GetFrame(unsigned offset);
 
 #endif
 

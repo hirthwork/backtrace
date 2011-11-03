@@ -13,26 +13,11 @@ alias common-flags
       <cflags>-pedantic-errors <cxxflags>-pedantic-errors
     ;
 
-alias coverage-flags
-    :
-    :
-    :
-    : <cflags>-p <cxxflags>-p <linkflags>-p <cflags>-fprofile-arcs
-      <cxxflags>-fprofile-arcs <linkflags>-fprofile-arcs
-      <cflags>-ftest-coverage <cxxflags>-ftest-coverage
-    ;
-
 lib dl ;
 
-alias backtrace-sources
-    : backtrace.cpp demangle.cpp dl common-flags
-    ;
-
-lib backtrace : backtrace-sources ;
-lib coverage : backtrace-sources coverage-flags ;
+lib backtrace : backtrace.cpp demangle.cpp frames.cpp dl common-flags ;
 
 explicit test ;
-explicit coverage ;
 
 package.install dist
     : <install-header-subdir>reinvented-wheels

@@ -17,9 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <execinfo.h>
 #include <dlfcn.h>
 
+#include <cerrno>
 #include <cstddef>
 #include <cstdlib>
 
@@ -30,8 +30,8 @@
 #include "record.h"
 
 #include "backtrace.hpp"
+#include "frames.hpp"
 #include "helpers.hpp"
-#include "record.hpp"
 
 static inline TBacktraceRecord ExtractBacktraceRecord(void* frame)
 {
@@ -50,90 +50,76 @@ static inline TBacktraceRecord ExtractBacktraceRecord(void* frame)
     return record;
 }
 
-int GetCurrentFrame(TBacktraceRecord* record, int offset)
+TBacktraceRecord NReinventedWheels::GetCurrentFrame(int offset)
 {
-    offset += 2;
-    TMalloced frames(calloc(offset, sizeof(void*)));
-    if(frames.Data())
+    if (void* frame = GetFrame(offset + 1))
     {
-        int size = backtrace(static_cast<void**>(frames.Data()), offset);
-        if(size == offset)
-        {
-            *record = ExtractBacktraceRecord(
-                static_cast<void**>(frames.Data())[offset - 1]);
-            return 1;
-        }
+        return ExtractBacktraceRecord(frame);
     }
-    return 0;
+    throw std::logic_error("offset is bigger that call stack depth");
 }
 
-static void* GetFrames(int& size, int initialDepth)
+int GetCurrentFrame(TBacktraceRecord* record, int offset)
 {
-    while (true)
+    if (void* frame = GetFrame(offset + 1))
     {
-        TMalloced frames(calloc(initialDepth, sizeof(void*)));
-        if(!frames.Data())
-        {
-            return NULL;
-        }
-
-        size = backtrace(static_cast<void**>(frames.Data()), initialDepth);
-        if(size < initialDepth)
-        {
-            return frames.Release();
-        }
-        else
-        {
-            initialDepth <<= 1;
-        }
+        *record = ExtractBacktraceRecord(frame);
+        return 1;
     }
+    return 0;
 }
 
 NReinventedWheels::TBacktrace NReinventedWheels::GetBacktrace(int offset,
     int initialDepth)
 {
     int size;
-    TMalloced frames(GetFrames(size, initialDepth + 2));
-    if(!frames.Data())
-    {
-        throw std::bad_alloc();
-    }
-
-    if(size <= offset + 2)
+    void** data = GetFrames(offset + 1, initialDepth, &size);
+    TMalloced frames(data);
+    if(size <= 0)
     {
         throw std::logic_error("offset is bigger that call stack depth");
     }
 
-    TBacktrace result(size - offset - 2);
-    for (int i = offset + 2, j = 0; i < size; ++i, ++j)
+    TBacktrace result(size);
+    for (int i = 0; i < size; ++i)
     {
-        result[j] =
-            ExtractBacktraceRecord(static_cast<void**>(frames.Data())[i]);
+        result[i] = ExtractBacktraceRecord(*data++);
     }
     return result;
 }
 
 TBacktraceRecord* GetBacktrace(int* size, int offset, int initialDepth)
 {
-    TMalloced frames(GetFrames(*size, initialDepth + 2));
-    if(!frames.Data() || *size <= offset + 2)
+    void** data;
+    try
     {
+        data = GetFrames(offset + 1, initialDepth, size);
+    }
+    catch (const std::bad_alloc& exc)
+    {
+        errno = EDOM;
+        return NULL;
+    }
+    TMalloced frames(data);
+    if (*size <= 0)
+    {
+        errno = ERANGE;
         return NULL;
     }
 
-    TMalloced result(calloc(*size - offset - 2,
-        sizeof(TBacktraceRecord)));
-    if(!result.Data())
+    TBacktraceRecord* iter = static_cast<TBacktraceRecord*>(
+        malloc(*size * sizeof(TBacktraceRecord)));
+    if(!iter)
     {
+        errno = EDOM;
         return NULL;
     }
 
-    TBacktraceRecord* iter = static_cast<TBacktraceRecord*>(result.Data());
-    for (int i = offset + 2; i < *size; ++i, ++iter)
+    TMalloced result(iter);
+    for (int i = 0; i < *size; ++i)
     {
-        *iter = ExtractBacktraceRecord(static_cast<void**>(frames.Data())[i]);
+        *iter++ = ExtractBacktraceRecord(*data++);
     }
-    *size -= offset + 2;
 
     return reinterpret_cast<TBacktraceRecord*>(result.Release());
 }

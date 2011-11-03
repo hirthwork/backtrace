@@ -1,3 +1,4 @@
+import coverage ;
 import testing ;
 
 lib boost_unit_test_framework
@@ -23,18 +24,18 @@ lib boost_test_exec_monitor
 alias boost_test : boost_unit_test_framework boost_test_exec_monitor ;
 
 compile demangle-double-inclusion.cpp ;
-run test-demangle.cpp ..//coverage boost_test ;
+run test-demangle.cpp ..//backtrace boost_test ;
 
 compile helpers-double-inclusion.cpp ;
 
 compile backtrace-double-inclusion-c.c ;
 compile backtrace-double-inclusion.cpp ;
-run test-backtrace-c.c ..//coverage ;
-run test-backtrace.cpp ..//coverage boost_test ;
+run test-backtrace-c.c ..//backtrace ;
+run test-backtrace.cpp ..//backtrace boost_test ;
 
 compile record-double-inclusion-c.c ;
 compile record-double-inclusion.cpp ;
-run test-record.cpp ..//coverage boost_test ;
+run test-record.cpp ..//backtrace boost_test ;
 
 compile malloced-explicit-good.cpp ;
 compile-fail malloced-explicit-bad.cpp ;

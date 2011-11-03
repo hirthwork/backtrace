@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -60,7 +61,7 @@ int TestGetCurrentFrame()
     result = GetCurrentFrame(&record, 1);
     REQUIRE_EQUAL(result, 1);
     REQUIRE_STRINGS_EQUAL(record.Symbol_, "main");
-    result = GetCurrentFrame(&record, 10);
+    result = GetCurrentFrame(&record, 100);
     REQUIRE_EQUAL(result, 0);
     result = GetCurrentFrame(&record, 0x7fffffff);
     REQUIRE_EQUAL(result, 0);
@@ -86,7 +87,10 @@ int TestGetBacktrace()
     free(backtrace);
     backtrace = GetBacktrace(&size, 100, 10);
     REQUIRE_EQUAL(backtrace, 0);
-    free(backtrace);
+    REQUIRE_EQUAL(errno, ERANGE);
+    backtrace = GetBacktrace(&size, 100, 0x7fffffff);
+    REQUIRE_EQUAL(backtrace, 0);
+    REQUIRE_EQUAL(errno, EDOM);
     return 0;
 }
 

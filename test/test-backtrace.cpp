@@ -24,6 +24,7 @@
 #include <stdexcept>
 
 #include <backtrace.hpp>
+#include <record.hpp>
 
 #define BOOST_TEST_MODULE BacktraceTest
 #include <boost/test/unit_test.hpp>
@@ -52,6 +53,13 @@ BOOST_AUTO_TEST_CASE(backtrace)
         "_ZN9backtrace11test_methodEv");
 }
 
+BOOST_AUTO_TEST_CASE(current_frame)
+{
+    BOOST_REQUIRE_EQUAL(NReinventedWheels::TDemangledBacktraceRecord(
+        NReinventedWheels::GetCurrentFrame()).Function_,
+        "current_frame::test_method()");
+}
+
 class TExceptionChecker
 {
     const char* const Text_;
@@ -76,5 +84,8 @@ BOOST_AUTO_TEST_CASE(error_handling)
     BOOST_REQUIRE_EXCEPTION(NReinventedWheels::GetBacktrace(0, 0x7fffffff),
         std::bad_alloc,
         TExceptionChecker("std::bad_alloc"));
+    BOOST_REQUIRE_EXCEPTION(NReinventedWheels::GetCurrentFrame(1000),
+        std::logic_error,
+        TExceptionChecker("offset is bigger that call stack depth"));
 }
 
