@@ -1,41 +1,19 @@
 import coverage ;
 import testing ;
 
-lib boost_unit_test_framework
-    :
-    : <threading>single
-    ;
-
-lib boost_unit_test_framework
-    :
-    : <name>boost_unit_test_framework-mt <threading>multi
-    ;
-
-lib boost_test_exec_monitor
-    :
-    : <threading>single
-    ;
-
-lib boost_test_exec_monitor
-    :
-    : <name>boost_test_exec_monitor-mt <threading>multi
-    ;
-
-alias boost_test : boost_unit_test_framework boost_test_exec_monitor ;
-
 compile demangle-double-inclusion.cpp ;
-run test-demangle.cpp ..//backtrace boost_test ;
+run test-demangle.cpp ..//backtrace ;
 
 compile helpers-double-inclusion.cpp ;
 
 compile backtrace-double-inclusion-c.c ;
 compile backtrace-double-inclusion.cpp ;
 run test-backtrace-c.c ..//backtrace ;
-run test-backtrace.cpp ..//backtrace boost_test ;
+run test-backtrace.cpp ..//backtrace ;
 
 compile record-double-inclusion-c.c ;
 compile record-double-inclusion.cpp ;
-run test-record.cpp ..//backtrace boost_test ;
+run test-record.cpp ..//backtrace ;
 
 compile malloced-explicit-good.cpp ;
 compile-fail malloced-explicit-bad.cpp ;

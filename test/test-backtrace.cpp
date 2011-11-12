@@ -27,7 +27,7 @@
 #include <record.hpp>
 
 #define BOOST_TEST_MODULE BacktraceTest
-#include <boost/test/unit_test.hpp>
+#include <boost/test/included/unit_test.hpp>
 
 void g(int)
 {
