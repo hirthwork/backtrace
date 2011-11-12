@@ -19,10 +19,23 @@ lib backtrace : backtrace.cpp demangle.cpp frames.cpp dl common-flags ;
 
 explicit test ;
 
-package.install dist
-    : <install-header-subdir>reinvented-wheels
+package.install library
+    :
     :
     : backtrace
-    : backtrace.h backtrace.hpp demangle.hpp record.h record.hpp
+    ;
+
+package.install headers
+    : <install-header-subdir>reinvented-wheels
+    :
+    :
+    : backtrace.h record.h
+    ;
+
+package.install headers-cxx
+    : <install-header-subdir>reinvented-wheels
+    :
+    :
+    : backtrace.hpp demangle.hpp record.hpp
     ;
 
