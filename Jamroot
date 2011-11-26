@@ -10,7 +10,7 @@ project
 
 lib dl ;
 
-lib stlport : : <toolset>clang ;
+lib stlport ;
 
 alias libs : dl ;
 alias libs : dl stlport : <toolset>clang ;
