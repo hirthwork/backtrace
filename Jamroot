@@ -2,20 +2,20 @@ import package ;
 
 project
     : requirements <include>. <linkflags>-rdynamic
-    ;
-
-alias common-flags
-    :
-    :
-    :
-    : <cflags>-Wall <cxxflags>-Wall <cflags>-Wextra <cxxflags>-Wextra
+      <cflags>-Wall <cxxflags>-Wall <cflags>-Wextra <cxxflags>-Wextra
       <cflags>-Werror <cxxflags>-Werror <cflags>-ansi <cxxflags>-ansi
       <cflags>-pedantic-errors <cxxflags>-pedantic-errors
+      <toolset>clang:<cxxflags>-isystem/usr/include/stlport
     ;
 
 lib dl ;
 
-lib backtrace : backtrace.cpp demangle.cpp frames.cpp dl common-flags ;
+lib stlport : : <toolset>clang ;
+
+alias libs : dl ;
+alias libs : dl stlport : <toolset>clang ;
+
+lib backtrace : backtrace.cpp demangle.cpp frames.cpp libs ;
 
 explicit test ;
 

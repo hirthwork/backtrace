@@ -1,5 +1,5 @@
 /*
- * demangle.cpp             -- symbol demangling helper
+ * unwind.h                 -- required unwind functions prototypes
  *
  * Copyright (C) 2011 Dmitry Potapov <potapov.d@gmail.com>
  *
@@ -17,24 +17,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <exception>
-#include <cxxabi.h>
+#ifndef __UNWIND_H_2011_11_26__
+#define __UNWIND_H_2011_11_26__
 
-#include <string>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#include "demangle.hpp"
-#include "helpers.hpp"
+struct _Unwind_Context;
+extern unsigned _Unwind_GetIP(struct _Unwind_Context*);
+extern unsigned _Unwind_GetGR(struct _Unwind_Context*, int);
+extern unsigned _Unwind_GetCFA(struct _Unwind_Context*);
 
-std::string NReinventedWheels::Demangle(const char* symbol)
+typedef enum
 {
-    if(!symbol)
-    {
-        return std::string();
-    }
+  _URC_NO_REASON = 0,
+  _URC_END_OF_STACK = 5
+} _Unwind_Reason_Code;
 
-    int status;
-    TMalloced demangled(
-        abi::__cxa_demangle(symbol, NULL, NULL, &status));
-    return status ? symbol : static_cast<const char*>(demangled.Data());
+extern _Unwind_Reason_Code _Unwind_Backtrace(
+    _Unwind_Reason_Code (*)(struct _Unwind_Context*, void*), void*);
+
+#ifdef __cplusplus
 }
+#endif
+
+#endif
+
 

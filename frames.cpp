@@ -17,11 +17,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <unwind.h>
-
 #include <cstdlib>
 
 #include <new>
+
+#include "unwind.h"
 
 struct TTrace {
     void** Backtrace;
