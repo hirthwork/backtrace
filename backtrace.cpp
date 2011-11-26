@@ -56,7 +56,7 @@ TBacktraceRecord NReinventedWheels::GetCurrentFrame(int offset)
     {
         return ExtractBacktraceRecord(frame);
     }
-    throw std::logic_error("offset is bigger that call stack depth");
+    throw std::logic_error("offset is bigger than call stack");
 }
 
 int GetCurrentFrame(TBacktraceRecord* record, int offset)
@@ -77,7 +77,7 @@ NReinventedWheels::TBacktrace NReinventedWheels::GetBacktrace(int offset,
     TMalloced frames(data);
     if(size <= 0)
     {
-        throw std::logic_error("offset is bigger that call stack depth");
+        throw std::logic_error("offset is bigger than call stack");
     }
 
     TBacktrace result(size);
