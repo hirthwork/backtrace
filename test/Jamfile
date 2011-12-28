@@ -1,18 +1,25 @@
 import testing ;
 
+alias valgrind
+    :
+    :
+    :
+    : <testing.launcher>"valgrind --leak-check=full --error-exitcode=1"
+    ;
+
 compile demangle-double-inclusion.cpp ;
-run test-demangle.cpp ..//backtrace ;
+unit-test test-demangle : test-demangle.cpp ..//backtrace valgrind ;
 
 compile helpers-double-inclusion.cpp ;
 
 compile backtrace-double-inclusion-c.c ;
 compile backtrace-double-inclusion.cpp ;
-run test-backtrace-c.c ..//backtrace ;
-run test-backtrace.cpp ..//backtrace ;
+unit-test test-backtrace-c : test-backtrace-c.c ..//backtrace valgrind ;
+unit-test test-backtrace : test-backtrace.cpp ..//backtrace valgrind ;
 
 compile record-double-inclusion-c.c ;
 compile record-double-inclusion.cpp ;
-run test-record.cpp ..//backtrace ;
+unit-test test-record : test-record.cpp ..//backtrace valgrind ;
 
 compile malloced-explicit-good.cpp ;
 compile-fail malloced-explicit-bad.cpp ;
