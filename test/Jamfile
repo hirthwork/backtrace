@@ -1,4 +1,3 @@
-import coverage ;
 import testing ;
 
 compile demangle-double-inclusion.cpp ;

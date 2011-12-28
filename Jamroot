@@ -1,38 +1,63 @@
-import package ;
+import package : install ;
 
 project
     : requirements <include>. <linkflags>-rdynamic
       <cflags>-Wall <cxxflags>-Wall <cflags>-Wextra <cxxflags>-Wextra
       <cflags>-Werror <cxxflags>-Werror <cflags>-ansi <cxxflags>-ansi
       <cflags>-pedantic-errors <cxxflags>-pedantic-errors
-      <toolset>clang:<cxxflags>-isystem/usr/include/stlport
     ;
 
-lib dl ;
+lib dl : : <link>shared ;
 
-lib stlport ;
+lib backtrace : backtrace.cpp demangle.cpp frames.cpp dl ;
 
-alias libs : dl ;
-alias libs : dl stlport : <toolset>clang ;
+alias gcc-test
+    : test/<toolset>gcc/<toolset-gcc:version>4.3
+      test/<toolset>gcc/<toolset-gcc:version>4.4
+      test/<toolset>gcc/<toolset-gcc:version>4.5
+      test/<toolset>gcc/<toolset-gcc:version>4.6
+      test/<toolset>gcc/<toolset-gcc:version>4.7
+    ;
 
-lib backtrace : backtrace.cpp demangle.cpp frames.cpp libs ;
+alias stdlib-test
+    : gcc-test/<stdlib>native
+      gcc-test/<stdlib>stlport
+    ;
 
-explicit test ;
+alias toolset-test
+    : stdlib-test
+      test/<toolset>clang
+    ;
 
-package.install library
+alias link-test
+    : toolset-test/<link>static
+      toolset-test/<link>shared
+    ;
+
+alias threading-test
+    : link-test/<threading>single
+      link-test/<threading>multi
+    ;
+
+alias mega-test : threading-test ;
+
+explicit
+    test gcc-test stdlib-test toolset-test link-test threading-test mega-test ;
+
+install library
     :
     :
     : backtrace
     ;
 
-package.install headers
+install headers
     : <install-header-subdir>reinvented-wheels
     :
     :
     : backtrace.h record.h
     ;
 
-package.install headers-cxx
+install headers-cxx
     : <install-header-subdir>reinvented-wheels
     :
     :

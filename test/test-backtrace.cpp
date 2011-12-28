@@ -80,12 +80,12 @@ BOOST_AUTO_TEST_CASE(error_handling)
 {
     BOOST_REQUIRE_EXCEPTION(NReinventedWheels::GetBacktrace(100),
         std::logic_error,
-        TExceptionChecker("offset is bigger that call stack depth"));
+        TExceptionChecker("offset is bigger than call stack"));
     BOOST_REQUIRE_EXCEPTION(NReinventedWheels::GetBacktrace(0, 0x7fffffff),
         std::bad_alloc,
         TExceptionChecker("std::bad_alloc"));
     BOOST_REQUIRE_EXCEPTION(NReinventedWheels::GetCurrentFrame(1000),
         std::logic_error,
-        TExceptionChecker("offset is bigger that call stack depth"));
+        TExceptionChecker("offset is bigger than call stack"));
 }
 
