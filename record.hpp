@@ -20,9 +20,9 @@
 #ifndef __RECORD_HPP_2011_09_20__
 #define __RECORD_HPP_2011_09_20__
 
-#include "record.h"
-
 #include <string>
+
+#include "record.h"
 
 #include "demangle.hpp"
 
@@ -30,9 +30,9 @@ namespace NReinventedWheels
 {
     struct TDemangledBacktraceRecord
     {
-        // NULL indicates error during record extraction
+        // zero indicates error during record extraction
         const char* Module_;
-        // NULL indicates symbol information absence
+        // zero indicates symbol information absence
         const char* Symbol_;
         // same as Symbol_ if demangling failed or empty string no symbol
         // information available

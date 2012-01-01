@@ -63,8 +63,6 @@ int TestGetCurrentFrame()
     REQUIRE_STRINGS_EQUAL(record.Symbol_, "main");
     result = GetCurrentFrame(&record, 100);
     REQUIRE_EQUAL(result, 0);
-    result = GetCurrentFrame(&record, 0x7fffffff);
-    REQUIRE_EQUAL(result, 0);
     return 0;
 }
 
@@ -81,9 +79,6 @@ int TestGetBacktrace()
     REQUIRE_NOT_EQUAL(backtrace, 0);
     REQUIRE_EQUAL(size - 1, sizeMinus1);
     REQUIRE_STRINGS_EQUAL(backtrace->Symbol_, "main");
-    free(backtrace);
-    backtrace = GetBacktrace(&size, 1, 0x7fffffff);
-    REQUIRE_EQUAL(backtrace, 0);
     free(backtrace);
     backtrace = GetBacktrace(&size, 100, 10);
     REQUIRE_EQUAL(backtrace, 0);

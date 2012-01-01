@@ -4,26 +4,33 @@ alias valgrind
     :
     :
     :
-    : <testing.launcher>"valgrind --leak-check=full --error-exitcode=1"
+    : <testing.launcher>"valgrind --leak-check=full --error-exitcode=1 --track-origins=yes -q --suppressions=test/glibc.supp"
     ;
 
-compile demangle-double-inclusion.cpp ;
-unit-test test-demangle : test-demangle.cpp ..//backtrace valgrind ;
-
-compile helpers-double-inclusion.cpp ;
+alias launcher : valgrind ;
+alias launcher : : <variant>coverage ;
 
 compile backtrace-double-inclusion-c.c ;
 compile backtrace-double-inclusion.cpp ;
-unit-test test-backtrace-c : test-backtrace-c.c ..//backtrace valgrind ;
-unit-test test-backtrace : test-backtrace.cpp ..//backtrace valgrind ;
-
+compile config-double-inclusion-c.c ;
+compile config-double-inclusion.cpp ;
+compile demangle-double-inclusion.cpp ;
+compile extract-double-inclusion-c.c ;
+compile extract-double-inclusion.cpp ;
+compile frames-double-inclusion.c ;
+compile helpers-double-inclusion.cpp ;
 compile record-double-inclusion-c.c ;
 compile record-double-inclusion.cpp ;
-unit-test test-record : test-record.cpp ..//backtrace valgrind ;
+compile unwind-double-inclusion.c ;
 
 compile malloced-explicit-good.cpp ;
 compile-fail malloced-explicit-bad.cpp ;
 
 compile demangled-explicit-good.cpp ;
 compile-fail demangled-explicit-bad.cpp ;
+
+unit-test test-demangle : test-demangle.cpp ..//backtracexx launcher ;
+unit-test test-backtrace-c : test-backtrace-c.c ..//backtrace launcher ;
+unit-test test-backtrace : test-backtrace.cpp ..//backtracexx launcher ;
+unit-test test-record : test-record.cpp ..//backtracexx launcher ;
 

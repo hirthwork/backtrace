@@ -1,0 +1,19 @@
+% Copyright 2011, 2012 by Dmitry Potapov <potapov.d@gmail.com>. All rights
+% reserved.
+% See file COPYING for more information.
+
+\title{Backtrace helper library}
+
+\section{Introduction}
+The purpose of this library is to provide APIs for current program call stack
+retrieval handy and painless manner.
+
+\section{Rationale}
+Current {\tt backtrace} implementations ({\tt glibc}, {\tt libexecinfo}) doesn't
+provide functionality to retrieve whole backtrace at once. At the same time {\tt
+backtrace_symbols} prints symbol information in its own manner, which is not a
+part of any standard and can vary from one version to another. Backtrace helper
+library is intended to provide functions for complete backtrace retrieval with
+instant access to symbol and module name without strings parsing of any kind.
+
+

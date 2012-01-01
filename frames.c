@@ -1,5 +1,5 @@
 /*
- * frames.cpp               -- low-level frames extracting functions
+ * frames.c                 -- low-level frames extracting functions
  *
  * Copyright (C) 2011 Dmitry Potapov <potapov.d@gmail.com>
  *
@@ -17,10 +17,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <cstdlib>
+#include <errno.h>
+#include <stdlib.h>
 
-#include <new>
-
+#include "config.h"
+#include "frames.h"
 #include "unwind.h"
 
 struct TTrace {
@@ -43,19 +44,20 @@ struct TLayout {
     void* ReturnAddress;
 };
 
-static void Append(struct TTrace* trace, void* ip)
+static BACKTRACE_INLINE void Append(struct TTrace* trace, void* ip)
 {
     if (trace->Size == trace->Allocated)
     {
+        void* backtrace = trace->Backtrace;
         trace->Allocated <<= 1;
-        void* backtrace = realloc(trace->Backtrace,
-            sizeof(void*) * trace->Allocated);
-        if (!backtrace)
+        trace->Backtrace =
+            realloc(trace->Backtrace, sizeof(void*) * trace->Allocated);
+        if (!trace->Backtrace)
         {
-            free(trace->Backtrace);
-            throw std::bad_alloc();
+            free(backtrace);
+            errno = EDOM;
+            return;
         }
-        trace->Backtrace = static_cast<void**>(backtrace);
     }
     if (trace->Size >= 0)
     {
@@ -67,57 +69,69 @@ static void Append(struct TTrace* trace, void* ip)
 static _Unwind_Reason_Code BacktraceHandler(struct _Unwind_Context* context,
     void* p)
 {
-    struct TTrace* trace = static_cast<TTrace*>(p);
+    struct TTrace* trace = p;
     if (trace->Size >= 0)
     {
-        Append(trace, reinterpret_cast<void*>(_Unwind_GetIP(context)));
+        Append(trace, (void*)(_Unwind_GetIP(context)));
     }
     else
     {
         ++trace->Size;
     }
-    trace->LastEbp = reinterpret_cast<void*>(_Unwind_GetGR(context, 5));
-    trace->LastEsp = reinterpret_cast<void*>(_Unwind_GetCFA(context));
+    trace->LastEbp = (void*)(_Unwind_GetGR(context, 5));
+    trace->LastEsp = (void*)(_Unwind_GetCFA(context));
     return trace->Backtrace ? _URC_NO_REASON : _URC_END_OF_STACK;
 }
 
 void** GetFrames(unsigned offset, unsigned initialDepth, int* size)
 {
     struct TTrace trace;
-    trace.Backtrace = static_cast<void**>(malloc(sizeof(void*) * initialDepth));
+    trace.Backtrace = malloc(sizeof(void*) * initialDepth);
     trace.Size = -offset - 1;
     trace.Allocated = initialDepth;
     if(!trace.Backtrace)
     {
-        throw std::bad_alloc();
+        errno = EDOM;
     }
-
-    _Unwind_Backtrace(BacktraceHandler, &trace);
-    struct TLayout* ebp = static_cast<struct TLayout*>(trace.LastEbp);
-    while(trace.Backtrace && ebp >= trace.LastEsp &&
-        !(reinterpret_cast<long>(ebp) & 3))
+    else
     {
-        Append(&trace, ebp->ReturnAddress);
-        ebp = ebp->Next;
+        struct TLayout* ebp;
+        _Unwind_Backtrace(BacktraceHandler, &trace);
+        ebp = trace.LastEbp;
+        while(trace.Backtrace && (void*)ebp >= trace.LastEsp
+            && !((long)(ebp) & 3))
+        {
+            Append(&trace, ebp->ReturnAddress);
+            ebp = ebp->Next;
+        }
+        if (trace.Size > 0)
+        {
+            *size = trace.Size;
+        }
+        else
+        {
+            errno = ERANGE;
+            free(trace.Backtrace);
+            trace.Backtrace = 0;
+        }
     }
-    *size = trace.Size;
     return trace.Backtrace;
 }
 
 static _Unwind_Reason_Code FrameHandler(struct _Unwind_Context* context,
     void* p)
 {
-    struct TFrame* frame = static_cast<TFrame*>(p);
+    struct TFrame* frame = p;
     ++frame->Position;
     if (frame->Position > 0)
     {
-        frame->Frame = reinterpret_cast<void*>(_Unwind_GetIP(context));
+        frame->Frame = (void*)(_Unwind_GetIP(context));
         return _URC_END_OF_STACK;
     }
     else
     {
-        frame->LastEbp = reinterpret_cast<void*>(_Unwind_GetGR(context, 5));
-        frame->LastEsp = reinterpret_cast<void*>(_Unwind_GetCFA(context));
+        frame->LastEbp = (void*)(_Unwind_GetGR(context, 5));
+        frame->LastEsp = (void*)(_Unwind_GetCFA(context));
         return _URC_NO_REASON;
     }
 }
@@ -131,18 +145,20 @@ void* GetFrame(unsigned offset)
     {
         return frame.Frame;
     }
-
-    struct TLayout* ebp = static_cast<struct TLayout*>(frame.LastEbp);
-    while((void*)ebp >= frame.LastEsp && !((long)ebp & 3))
+    else
     {
-        if (frame.Position >= 0)
+        struct TLayout* ebp = frame.LastEbp;
+        while((void*)ebp >= frame.LastEsp && !((long)ebp & 3))
         {
-            return ebp->ReturnAddress;
+            if (frame.Position >= 0)
+            {
+                return ebp->ReturnAddress;
+            }
+            ++frame.Position;
+            ebp = ebp->Next;
         }
-        ++frame.Position;
-        ebp = ebp->Next;
-    }
 
-    return NULL;
+        return 0;
+    }
 }
 

@@ -2,14 +2,29 @@ import package : install ;
 
 project
     : requirements <include>. <linkflags>-rdynamic
-      <cflags>-Wall <cxxflags>-Wall <cflags>-Wextra <cxxflags>-Wextra
-      <cflags>-Werror <cxxflags>-Werror <cflags>-ansi <cxxflags>-ansi
-      <cflags>-pedantic-errors <cxxflags>-pedantic-errors
+      <warnings>all <cflags>-Wextra <cxxflags>-Wextra
+      <warnings-as-errors>on <cflags>-ansi <cxxflags>-ansi
+      <cflags>-D_GNU_SOURCE
     ;
 
 lib dl : : <link>shared ;
 
-lib backtrace : backtrace.cpp demangle.cpp frames.cpp dl ;
+lib backtrace : backtrace-c.c frames.c dl ;
+lib backtracexx : backtrace.cpp demangle.cpp backtrace ;
+
+install backtrace-install
+    : <install-header-subdir>backtrace
+    :
+    : backtrace
+    : backtrace.h record.h
+    ;
+
+install backtracexx-install
+    : <install-header-subdir>backtrace
+    :
+    : backtracexx
+    : backtrace.hpp demangle.hpp record.hpp
+    ;
 
 alias gcc-test
     : test/<toolset>gcc/<toolset-gcc:version>4.3
@@ -39,28 +54,21 @@ alias threading-test
       link-test/<threading>multi
     ;
 
-alias mega-test : threading-test ;
+alias runtime-test
+    : threading-test/<runtime-debugging>on
+      threading-test/<runtime-debugging>off
+    ;
+
+alias mega-test : runtime-test ;
 
 explicit
-    test gcc-test stdlib-test toolset-test link-test threading-test mega-test ;
-
-install library
-    :
-    :
-    : backtrace
-    ;
-
-install headers
-    : <install-header-subdir>reinvented-wheels
-    :
-    :
-    : backtrace.h record.h
-    ;
-
-install headers-cxx
-    : <install-header-subdir>reinvented-wheels
-    :
-    :
-    : backtrace.hpp demangle.hpp record.hpp
+    test
+    gcc-test
+    stdlib-test
+    toolset-test
+    link-test
+    threading-test
+    runtime-test
+    mega-test
     ;
 

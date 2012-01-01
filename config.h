@@ -1,5 +1,5 @@
 /*
- * frames.hpp               -- low-level frames extracting functions
+ * config.h                 -- Helper defines
  *
  * Copyright (C) 2011 Dmitry Potapov <potapov.d@gmail.com>
  *
@@ -17,14 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __FRAMES_H_2011_09_24__
-#define __FRAMES_H_2011_09_24__
+#ifndef __CONFIG_H_31_12_2011__
+#define __CONFIG_H_31_12_2011__
 
-/* returns NULL on failure */
-void** GetFrames(unsigned offset, unsigned initialDepth, int* size);
-
-/* returns NULL on failure */
-void* GetFrame(unsigned offset);
+#if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L)  \
+    || defined(__cplusplus)
+#define BACKTRACE_INLINE inline
+#else
+#define BACKTRACE_INLINE
+#endif
 
 #endif
 

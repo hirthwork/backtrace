@@ -1,0 +1,6 @@
+{
+    strlen
+    Memcheck:Cond
+    obj:/lib/ld-2.13.so
+}
+

@@ -1,5 +1,5 @@
 /*
- * backtrace.hpp            -- backtrace helper
+ * extract.h                -- TBacktraceRecord extraction routine
  *
  * Copyright (C) 2011 Dmitry Potapov <potapov.d@gmail.com>
  *
@@ -17,18 +17,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __BACKTRACE_HPP_2011_09_20__
-#define __BACKTRACE_HPP_2011_09_20__
+#ifndef __EXTRACT_H_31_12_2011__
+#define __EXTRACT_H_31_12_2011__
 
-#include <vector>
+#include <dlfcn.h>
 
+#include "config.h"
 #include "record.h"
 
-namespace NReinventedWheels
+static BACKTRACE_INLINE TBacktraceRecord ExtractBacktraceRecord(void* frame)
 {
-    TBacktraceRecord GetCurrentFrame(int offset = 0);
-    typedef std::vector<TBacktraceRecord> TBacktrace;
-    TBacktrace GetBacktrace(int offset = 0, int initialDepth = 10);
+    Dl_info info;
+    TBacktraceRecord record = {0, 0};
+    if(frame && dladdr(frame, &info))
+    {
+        record.Module_ = info.dli_fname;
+        record.Symbol_ = info.dli_sname;
+    }
+    return record;
 }
 
 #endif

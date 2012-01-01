@@ -29,7 +29,7 @@ extern "C" {
 /* returns zero on failure, non-zero on success */
 extern int GetCurrentFrame(TBacktraceRecord* record, int offset);
 
-/* returns NULL on failure */
+/* returns zero on failure */
 extern TBacktraceRecord* GetBacktrace(int* size, int offset,
     int initialDepth);
 
