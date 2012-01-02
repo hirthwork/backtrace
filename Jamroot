@@ -9,7 +9,10 @@ project
 
 lib dl : : <link>shared ;
 
-lib backtrace : backtrace-c.c frames.c dl ;
+alias libs : dl ;
+alias libs : : <target-os>freebsd ;
+
+lib backtrace : backtrace-c.c frames.c libs ;
 lib backtracexx : backtrace.cpp demangle.cpp backtrace ;
 
 install backtrace-install

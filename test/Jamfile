@@ -1,5 +1,9 @@
 import testing ;
 
+project 
+    : requirements <target-os>freebsd:<include>/usr/local/include
+    ;
+
 alias valgrind
     :
     :
