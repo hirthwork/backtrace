@@ -26,7 +26,7 @@ install backtracexx-install
     : <install-header-subdir>backtrace
     :
     : backtracexx
-    : backtrace.hpp demangle.hpp record.hpp
+    : backtrace.hpp demangle.hpp record.h record.hpp
     ;
 
 alias gcc-test

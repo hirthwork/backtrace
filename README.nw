@@ -2,18 +2,96 @@
 % reserved.
 % See file COPYING for more information.
 
+\documentclass{article}
+\usepackage{hyperref}
+\begin{document}
 \title{Backtrace helper library}
+\maketitle
 
 \section{Introduction}
 The purpose of this library is to provide APIs for current program call stack
-retrieval handy and painless manner.
+retrieval in handy and painless manner.
 
 \section{Rationale}
 Current {\tt backtrace} implementations ({\tt glibc}, {\tt libexecinfo}) doesn't
 provide functionality to retrieve whole backtrace at once. At the same time {\tt
-backtrace_symbols} prints symbol information in its own manner, which is not a
+backtrace\_symbols} prints symbol information in its own manner, which is not a
 part of any standard and can vary from one version to another. Backtrace helper
 library is intended to provide functions for complete backtrace retrieval with
 instant access to symbol and module name without strings parsing of any kind.
 
+\section{Installation}
 
+\subsection{Prerequisites}
+\begin{enumerate}
+\item
+Linux or FreeBSD (I haven't performed any testing on other *BSD systems, as well
+as on any non-BSD Unix distribution)
+\item
+\href{http://www.boost.org/boost-build2/}{Boost.Build}
+\item
+{\tt glibc} (other libc implementations wasn't tested yet)
+\item
+{\tt g++} (as Boost.Build uses {\tt g++} even for pure C targets build)
+\end{enumerate}
+
+\subsection{Pure C library installation}
+Change your current working directory to {\tt backtrace} source distribution
+root and execute the following command:
+\begin{verbatim}
+    bjam backtrace-install release
+\end{verbatim}
+
+After this {\tt backtrace} library will be built and installed among with
+required headers. The default installation prefix is {\tt /usr/local} which can
+be overridden using {\tt --prefix=<installation path>} option:
+\begin{verbatim}
+    bjam backtrace-install release --prefix=/usr
+\end{verbatim}
+
+\subsection{C++-library installation}
+Change your current working directory to {\tt backtrace} source distribution
+root and execute the following command:
+\begin{verbatim}
+    bjam backtracexx-install release
+\end{verbatim}
+
+As with the pure C library installation, library and headers will be installed
+to {\tt /usr/local} by default. Both pure C and C++ versions can be installed
+using the following command:
+\begin{verbatim}
+bjam backtrace-install backtracexx-install release
+\end{verbatim}
+
+\subsection{Other installation options}
+
+\subsubsection{Static library installation}
+Backtrace can be built as static library by adding {\tt link=static} option to
+bjam invocation command. It is possible to build and install static and shared
+versions of library at once:
+\begin{verbatim}
+    bjam backtracexx-install release link=static,shared
+\end{verbatim}
+
+\subsubsection{Debug version installation}
+Debug version of {\tt backtrace} library can be installed by invoking
+installation command without specifying {\tt release} build variant in command
+line:
+\begin{verbatim}
+    bjam backtrace-install
+\end{verbatim}
+
+\subsection{Running tests}
+In order to ensure that {\tt backtrace} is sane on current environment,
+unit-tests can be used:
+\begin{verbatim}
+    bjam test
+\end{verbatim}
+
+In this case, tests will be built, executed and their status will be reported.
+For most users it is enough to check the return code of the command specified
+above. As for most Linux utilities zero return code states for successful tests
+executions without failures.
+
+\section{Getting started}
+\end{document}
