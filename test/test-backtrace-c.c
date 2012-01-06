@@ -23,6 +23,7 @@
 #include <string.h>
 
 #include <backtrace.h>
+#include <record.h>
 
 #define REQUIRE_EQUAL(first, second)                        \
     if (first != second) {                                  \
@@ -45,7 +46,7 @@
 
 static int TestGetCurrentFrameStatic()
 {
-    TBacktraceRecord record;
+    struct TBacktraceRecord record;
     int result = GetCurrentFrame(&record, 0);
     REQUIRE_EQUAL(result, 1);
 #ifdef __FreeBSD__
@@ -58,7 +59,7 @@ static int TestGetCurrentFrameStatic()
 
 int TestGetCurrentFrame()
 {
-    TBacktraceRecord record;
+    struct TBacktraceRecord record;
     int result = GetCurrentFrame(&record, 0);
     REQUIRE_EQUAL(result, 1);
     REQUIRE_STRINGS_EQUAL(record.Symbol_, "TestGetCurrentFrame");
@@ -74,7 +75,7 @@ int TestGetBacktrace()
 {
     int size;
     int sizeMinus1;
-    TBacktraceRecord* backtrace = GetBacktrace(&size, 0, 1);
+    struct TBacktraceRecord* backtrace = GetBacktrace(&size, 0, 1);
     REQUIRE_NOT_EQUAL(backtrace, 0);
     REQUIRE_STRINGS_EQUAL(backtrace->Symbol_, "TestGetBacktrace");
     REQUIRE_STRINGS_EQUAL(backtrace[1].Symbol_, "main");

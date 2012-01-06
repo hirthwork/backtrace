@@ -25,7 +25,7 @@
 #include "frames.h"
 #include "record.h"
 
-int GetCurrentFrame(TBacktraceRecord* record, int offset)
+int GetCurrentFrame(struct TBacktraceRecord* record, int offset)
 {
     void* frame = GetFrame(offset + 1);
     if (frame)
@@ -36,13 +36,14 @@ int GetCurrentFrame(TBacktraceRecord* record, int offset)
     return 0;
 }
 
-TBacktraceRecord* GetBacktrace(int* size, int offset, int initialDepth)
+struct TBacktraceRecord* GetBacktrace(int* size, int offset, int initialDepth)
 {
     void** data = GetFrames(offset + 1, initialDepth, size);
-    TBacktraceRecord* result = 0;
+    struct TBacktraceRecord* result = 0;
     if (data)
     {
-        TBacktraceRecord* iter = malloc(*size * sizeof(TBacktraceRecord));
+        struct TBacktraceRecord* iter =
+            malloc(*size * sizeof(struct TBacktraceRecord));
         result = iter;
         if (!result)
         {

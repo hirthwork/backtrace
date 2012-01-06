@@ -25,10 +25,11 @@
 #include "config.h"
 #include "record.h"
 
-static BACKTRACE_INLINE TBacktraceRecord ExtractBacktraceRecord(void* frame)
+static BACKTRACE_INLINE struct TBacktraceRecord ExtractBacktraceRecord(
+    void* frame)
 {
     Dl_info info;
-    TBacktraceRecord record = {0, 0};
+    struct TBacktraceRecord record = {0, 0};
     if(frame && dladdr(frame, &info))
     {
         record.Module_ = info.dli_fname;

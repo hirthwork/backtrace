@@ -20,17 +20,17 @@
 #ifndef __BACKTRACE_H_2011_09_24__
 #define __BACKTRACE_H_2011_09_24__
 
-#include "record.h"
-
 #ifdef  __cplusplus
 extern "C" {
 #endif
 
+struct TBacktraceRecord;
+
 /* returns zero on failure, non-zero on success */
-extern int GetCurrentFrame(TBacktraceRecord* record, int offset);
+extern int GetCurrentFrame(struct TBacktraceRecord* record, int offset);
 
 /* returns zero on failure */
-extern TBacktraceRecord* GetBacktrace(int* size, int offset,
+extern struct TBacktraceRecord* GetBacktrace(int* size, int offset,
     int initialDepth);
 
 #ifdef  __cplusplus

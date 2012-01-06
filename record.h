@@ -20,13 +20,13 @@
 #ifndef __RECORD_H_2011_09_24__
 #define __RECORD_H_2011_09_24__
 
-typedef struct
+struct TBacktraceRecord
 {
     /* NULL indicates error during record extraction */
     const char* Module_;
     /* NULL indicates symbol information absence */
     const char* Symbol_;
-} TBacktraceRecord;
+};
 
 #endif
 
