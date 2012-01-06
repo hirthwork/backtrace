@@ -4,19 +4,20 @@
 
 \documentclass{article}
 \usepackage{hyperref}
+\author{Dmitry Potapov <potapov.d@gmail.com>}
 \begin{document}
 \title{Backtrace helper library}
 \maketitle
 
 \section{Introduction}
-The purpose of this library is to provide APIs for current program call stack
-retrieval in handy and painless manner.
+The purpose of this library is to provide APIs for current program call
+stack retrieval in handy and painless manner.
 
 \section{Rationale}
 Current {\tt backtrace} implementations ({\tt glibc}, {\tt libexecinfo}) doesn't
 provide functionality to retrieve whole backtrace at once. At the same time {\tt
 backtrace\_symbols} prints symbol information in its own manner, which is not a
-part of any standard and can vary from one version to another. Backtrace helper
+part of any standard and can vary from one version to another.  Backtrace helper
 library is intended to provide functions for complete backtrace retrieval with
 instant access to symbol and module name without strings parsing of any kind.
 
@@ -25,8 +26,8 @@ instant access to symbol and module name without strings parsing of any kind.
 \subsection{Prerequisites}
 \begin{enumerate}
 \item
-Linux or FreeBSD (I haven't performed any testing on other *BSD systems, as well
-as on any non-BSD Unix distribution)
+Linux or FreeBSD (I haven't performed any testing on other *BSD systems, as
+well as on any non-BSD Unix distribution)
 \item
 \href{http://www.boost.org/boost-build2/}{Boost.Build}
 \item
@@ -36,6 +37,8 @@ as on any non-BSD Unix distribution)
 \end{enumerate}
 
 \subsection{Pure C library installation}
+
+
 Change your current working directory to {\tt backtrace} source distribution
 root and execute the following command:
 \begin{verbatim}
@@ -66,9 +69,9 @@ bjam backtrace-install backtracexx-install release
 \subsection{Other installation options}
 
 \subsubsection{Static library installation}
-Backtrace can be built as static library by adding {\tt link=static} option to
-bjam invocation command. It is possible to build and install static and shared
-versions of library at once:
+{\tt Backtrace} can be built as static library by adding {\tt link=static}
+option to bjam invocation command. It is possible to build and install static
+and shared versions of library at once:
 \begin{verbatim}
     bjam backtracexx-install release link=static,shared
 \end{verbatim}
@@ -94,4 +97,24 @@ above. As for most Linux utilities zero return code states for successful tests
 executions without failures.
 
 \section{Getting started}
+As stated above, main {\tt backtrace} is to retrieve current call stack, there
+are two functions provided for this purpose:
+\begin{itemize}
+\item
+{\tt TBacktraceRecord* GetBacktrace(int* size, int offset, int initialDepth);} —
+is used for complete call stack retrieval. It returns pointer to array of
+backtrace records which was allocated using {\tt malloc}, or {\tt NULL} in case
+of failure. This function accepts three parameters:
+\begin{description}
+\item[size] Output parameter which stores the number of elements in array
+returned.
+\item[offset] Number of call stack frames to skip. In most cases there is no
+need to retrieve the call stack frame of the bottommost function (i.e. function
+which is calling {\tt GetBacktrace}). In this case 1 can be passed as {\tt
+offset}. Pass 0 here if you want to receive the complete call stack.
+\item[initialDepth]
+\end{description}
+\end{itemize}
+
 \end{document}
+

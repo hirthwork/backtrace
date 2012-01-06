@@ -1,6 +1,6 @@
 import testing ;
 
-project 
+project
     : requirements <target-os>freebsd:<include>/usr/local/include
     ;
 
