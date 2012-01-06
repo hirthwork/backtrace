@@ -36,7 +36,11 @@ void g(int)
     BOOST_REQUIRE_EQUAL(backtrace[0].Symbol_,
         "_ZN17NReinventedWheels12GetBacktraceEii");
     BOOST_REQUIRE_EQUAL(backtrace[1].Symbol_, "_Z1gi");
+#ifdef __FreeBSD__
+    BOOST_REQUIRE_EQUAL(backtrace[2].Symbol_, "_Z1gi");
+#else
     BOOST_REQUIRE(backtrace[2].Symbol_ == NULL);
+#endif
     BOOST_REQUIRE_EQUAL(backtrace[3].Symbol_,
         "_ZN9backtrace11test_methodEv");
 }

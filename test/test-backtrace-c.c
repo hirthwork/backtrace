@@ -48,7 +48,11 @@ static int TestGetCurrentFrameStatic()
     TBacktraceRecord record;
     int result = GetCurrentFrame(&record, 0);
     REQUIRE_EQUAL(result, 1);
+#ifdef __FreeBSD__
+    REQUIRE_STRINGS_EQUAL(record.Symbol_, "_start");
+#else
     REQUIRE_EQUAL(record.Symbol_, 0);
+#endif
     return 0;
 }
 
