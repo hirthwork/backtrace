@@ -24,40 +24,75 @@
 
 BOOST_AUTO_TEST_CASE(record1)
 {
-    TBacktraceRecord record = {"file", "_ZN10test_frame11test_methodEv"};
+    TBacktraceRecord record = {
+        reinterpret_cast<void*>(0xdeadbeef),
+        "file",
+        reinterpret_cast<void*>(0xface8d),
+        "_ZN10test_frame11test_methodEv",
+        reinterpret_cast<void*>(0x34)
+    };
     NReinventedWheels::TDemangledBacktraceRecord demangled(record);
+    BOOST_REQUIRE_EQUAL(demangled.Frame_, reinterpret_cast<void*>(0xdeadbeef));
     BOOST_REQUIRE_EQUAL(demangled.Module_, "file");
+    BOOST_REQUIRE_EQUAL(demangled.ModuleAddress_,
+        reinterpret_cast<void*>(0xface8d));
     BOOST_REQUIRE_EQUAL(demangled.Symbol_, "_ZN10test_frame11test_methodEv");
+    BOOST_REQUIRE_EQUAL(demangled.SymbolAddress_,
+        reinterpret_cast<void*>(0x34));
     BOOST_REQUIRE_EQUAL(demangled.Function_, "test_frame::test_method()");
 }
 
 BOOST_AUTO_TEST_CASE(record2)
 {
-    TBacktraceRecord record = {NULL,
-        "_ZN17NReinventedWheels15GetCurrentFrameEjb"};
+    TBacktraceRecord record = {
+        reinterpret_cast<void*>(0xd34dbeef),
+        NULL,
+        reinterpret_cast<void*>(0xface8d),
+        "_ZN17NReinventedWheels15GetCurrentFrameEjb",
+        reinterpret_cast<void*>(0x34)
+    };
     NReinventedWheels::TDemangledBacktraceRecord demangled(record);
+    BOOST_REQUIRE_EQUAL(demangled.Frame_, reinterpret_cast<void*>(0xd34dbeef));
     BOOST_REQUIRE(demangled.Module_ == NULL);
+    BOOST_REQUIRE_EQUAL(demangled.ModuleAddress_,
+        reinterpret_cast<void*>(0xface8d));
     BOOST_REQUIRE_EQUAL(demangled.Symbol_,
         "_ZN17NReinventedWheels15GetCurrentFrameEjb");
+    BOOST_REQUIRE_EQUAL(demangled.SymbolAddress_,
+        reinterpret_cast<void*>(0x34));
     BOOST_REQUIRE_EQUAL(demangled.Function_,
         "NReinventedWheels::GetCurrentFrame(unsigned int, bool)");
 }
 
 BOOST_AUTO_TEST_CASE(record3)
 {
-    TBacktraceRecord record = {"", "GetCurrentFrame"};
+    TBacktraceRecord record = {
+        NULL,
+        "",
+        reinterpret_cast<void*>(0xface8f),
+        "GetCurrentFrame",
+        reinterpret_cast<void*>(0x42)
+    };
     NReinventedWheels::TDemangledBacktraceRecord demangled(record);
+    BOOST_REQUIRE(demangled.Frame_ == NULL);
     BOOST_REQUIRE_EQUAL(demangled.Module_, "");
+    BOOST_REQUIRE_EQUAL(demangled.ModuleAddress_,
+        reinterpret_cast<void*>(0xface8f));
     BOOST_REQUIRE_EQUAL(demangled.Symbol_, "GetCurrentFrame");
+    BOOST_REQUIRE_EQUAL(demangled.SymbolAddress_,
+        reinterpret_cast<void*>(0x42));
     BOOST_REQUIRE_EQUAL(demangled.Function_, "GetCurrentFrame");
 }
 
 BOOST_AUTO_TEST_CASE(record4)
 {
-    TBacktraceRecord record = {NULL, NULL};
+    TBacktraceRecord record = {NULL, NULL, NULL, NULL, NULL};
     NReinventedWheels::TDemangledBacktraceRecord demangled(record);
+    BOOST_REQUIRE(demangled.Frame_ == NULL);
     BOOST_REQUIRE(demangled.Module_ == NULL);
+    BOOST_REQUIRE(demangled.ModuleAddress_ == NULL);
     BOOST_REQUIRE(demangled.Symbol_ == NULL);
+    BOOST_REQUIRE(demangled.SymbolAddress_ == NULL);
     BOOST_REQUIRE_EQUAL(demangled.Function_, "");
 }
 

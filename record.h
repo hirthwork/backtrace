@@ -22,10 +22,16 @@
 
 struct TBacktraceRecord
 {
+    /* Frame pointer, always valid and can be passed to addr2line */
+    const void* Frame_;
     /* NULL indicates error during record extraction */
     const char* Module_;
+    /* Address where module is loaded */
+    const void* ModuleAddress_;
     /* NULL indicates symbol information absence */
     const char* Symbol_;
+    /* Symbol address, can be used for offset calculation */
+    const void* SymbolAddress_;
 };
 
 #endif

@@ -29,11 +29,14 @@ static BACKTRACE_INLINE struct TBacktraceRecord ExtractBacktraceRecord(
     void* frame)
 {
     Dl_info info;
-    struct TBacktraceRecord record = {0, 0};
+    struct TBacktraceRecord record = {0, 0, 0, 0, 0};
     if(frame && dladdr(frame, &info))
     {
+        record.Frame_ = frame;
         record.Module_ = info.dli_fname;
+        record.ModuleAddress_ = info.dli_fbase;
         record.Symbol_ = info.dli_sname;
+        record.SymbolAddress_ = info.dli_saddr;
     }
     return record;
 }

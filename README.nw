@@ -159,7 +159,7 @@ and shouldn't print itself in call stack, so we will pass 1 as [[offset]].
 
 @ In order to print information stored in TBacktraceRecord, we need to include
 [[backtrace/record.h]], which contains its definition. Since, I'm going to use
-[[puts]] as output function, we also need to include [[stdio.h]].
+[[printf]] as output function, we also need to include [[stdio.h]].
 <<additional headers inclusion>>=
 #include <backtrace/record.h>
 #include <stdio.h>

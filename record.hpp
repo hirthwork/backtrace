@@ -30,18 +30,27 @@ namespace NReinventedWheels
 {
     struct TDemangledBacktraceRecord
     {
-        // zero indicates error during record extraction
-        const char* Module_;
-        // zero indicates symbol information absence
-        const char* Symbol_;
-        // same as Symbol_ if demangling failed or empty string no symbol
+        // Frame pointer, always valid and can be passed to addr2line
+        const void* const Frame_;
+        // NULL indicates error during record extraction
+        const char* const Module_;
+        // Address where module is loaded
+        const void* const ModuleAddress_;
+        // NULL indicates symbol information absence
+        const char* const Symbol_;
+        // Symbol address, can be used for offset calculation
+        const void* const SymbolAddress_;
+        // same as Symbol_ if demangling failed or empty string if no symbol
         // information available
-        std::string Function_;
+        const std::string Function_;
 
         explicit inline TDemangledBacktraceRecord(
             const TBacktraceRecord& record)
-            : Module_(record.Module_)
+            : Frame_(record.Frame_)
+            , Module_(record.Module_)
+            , ModuleAddress_(record.ModuleAddress_)
             , Symbol_(record.Symbol_)
+            , SymbolAddress_(record.SymbolAddress_)
             , Function_(Demangle(Symbol_))
         {
         }
