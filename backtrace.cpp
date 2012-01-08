@@ -21,6 +21,8 @@
 
 #include <new>
 #include <stdexcept>
+// this include required for std::logic_error construction, as it accepts
+// const reference to std::string
 #include <string>
 
 #include "extract.h"
@@ -36,7 +38,7 @@ TBacktraceRecord NReinventedWheels::GetCurrentFrame(int offset)
     {
         return ExtractBacktraceRecord(frame);
     }
-    throw std::logic_error(std::string("offset is bigger than call stack"));
+    throw std::logic_error("offset is bigger than call stack");
 }
 
 NReinventedWheels::TBacktrace NReinventedWheels::GetBacktrace(int offset,
@@ -52,8 +54,7 @@ NReinventedWheels::TBacktrace NReinventedWheels::GetBacktrace(int offset,
         }
         else
         {
-            throw std::logic_error(
-                std::string("offset is bigger than call stack"));
+            throw std::logic_error("offset is bigger than call stack");
         }
     }
 

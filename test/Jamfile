@@ -16,8 +16,8 @@ alias launcher : : <variant>coverage ;
 
 compile backtrace-double-inclusion-c.c ;
 compile backtrace-double-inclusion.cpp ;
-compile config-double-inclusion-c.c ;
-compile config-double-inclusion.cpp ;
+compile inline-double-inclusion-c.c ;
+compile inline-double-inclusion.cpp ;
 compile demangle-double-inclusion.cpp ;
 compile extract-double-inclusion-c.c ;
 compile extract-double-inclusion.cpp ;

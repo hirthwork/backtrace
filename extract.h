@@ -22,7 +22,7 @@
 
 #include <dlfcn.h>
 
-#include "config.h"
+#include "inline.h"
 #include "record.h"
 
 static BACKTRACE_INLINE struct TBacktraceRecord ExtractBacktraceRecord(

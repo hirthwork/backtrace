@@ -20,7 +20,7 @@
 #include <errno.h>
 #include <stdlib.h>
 
-#include "config.h"
+#include "inline.h"
 #include "frames.h"
 #include "unwind.h"
 
