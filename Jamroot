@@ -5,7 +5,7 @@ project
       <warnings>all <cflags>-Wextra <cxxflags>-Wextra
       <warnings-as-errors>on <cflags>-ansi <cxxflags>-ansi
       <define>_GNU_SOURCE=1
-      <define>_GLIBCXX_HAVE_WCSFTIME=1
+      <stdlib>stlport:<define>_GLIBCXX_HAVE_WCSFTIME=1
     ;
 
 lib dl : : <link>shared ;
