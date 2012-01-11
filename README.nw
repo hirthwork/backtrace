@@ -38,32 +38,37 @@ well as on any non-BSD Unix distribution)
 \item
 [[glibc]] (other libc implementations wasn't tested yet)
 \item
-[[g++]] (as Boost.Build uses [[g++]] even for pure C targets build)
+[[g++]] (as Boost.Build uses [[g++]] even for pure C targets build) or
+[[clang++]]
 \end{enumerate}
 
 \subsection{Pure C library installation}
 Change your current working directory to [[backtrace]] source distribution root
 and execute the following command:
-
-[[bjam backtrace-install release]]
+\begin{verbatim}
+bjam backtrace-install release
+\end{verbatim}
 
 After this [[backtrace]] library will be built and installed among with required
 headers. The default installation prefix is [[/usr/local]] which can be
-overridden using {\tt --prefix=<installation path>} option:
-
-[[bjam backtrace-install release --prefix=/usr]]
+overridden using [[--prefix=<installation path>]] option:
+\begin{verbatim}
+bjam backtrace-install release --prefix=/usr
+\end{verbatim}
 
 \subsection{C++-library installation}
 Change your current working directory to [[backtrace]] source distribution root
 and execute the following command:
-
-[[bjam backtracexx-install release]]
+\begin{verbatim}
+bjam backtracexx-install release
+\end{verbatim}
 
 As with the pure C library installation, library and headers will be installed
 to [[/usr/local]] by default. Both pure C and C++ versions can be installed
 using the following command:
-
-[[bjam backtrace-install backtracexx-install release]]
+\begin{verbatim}
+bjam backtrace-install backtracexx-install release
+\end{verbatim}
 
 \subsection{Other installation options}
 
@@ -71,35 +76,46 @@ using the following command:
 [[Backtrace]] can be built as static library by adding [[link=static]] option to
 bjam invocation command. It is possible to build and install static and shared
 libraries with single command:
-
-[[bjam backtracexx-install release link=static,shared]]
+\begin{verbatim}
+bjam backtracexx-install release link=static,shared
+\end{verbatim}
 
 \subsubsection{Debug version installation}
 Debug version of [[backtrace]] library can be installed by invoking installation
 command without specifying [[release]] build variant in command line:
+\begin{verbatim}
+bjam backtrace-install
+\end{verbatim}
 
-[[bjam backtrace-install]]
-
-\subsection{Running tests}
+\subsection{Sanity testing}
 In order to ensure that [[backtrace]] is sane on current environment, unit-tests
 can be used:
-
-[[bjam test]]
+\begin{verbatim}
+bjam test
+\end{verbatim}
 
 In this case, unit-tests will be built, executed and their status will be
 reported.  For most users it is enough to check the return code of the command
 specified above. As for most Linux utilities zero return code states for
 successful tests executions without failures.
+Please note that [[valrgind]] is required for test execution (or you can edit
+[[test/Jamfile]] by hands and comment out (using [[#]]) or delete line with
+words [[testing.launcher]]).
 
 \section{Getting started}
-As stated above, main [[backtrace]] is to retrieve current call stack, there are
-two functions provided for this purpose:
-\begin{itemize}
-\item
-[[TBacktraceRecord* GetBacktrace(int* size, int offset, int initialDepth);]]
-This function is used for complete call stack retrieval. It returns pointer to
-array of backtrace records which was allocated using [[malloc]], or [[NULL]] in
-case of failure. This function accepts three parameters:
+
+\subsection{[[GetBacktrace]] function}
+
+\subsubsection{Synopsis}
+\small{\begin{verbatim}
+#include <backtrace/backtrace.h>
+
+TBacktraceRecord* GetBacktrace(int* size, int offset, int initialDepth);
+\end{verbatim}}
+
+\subsubsection{Description}
+[[GetBacktrace]] function is used for complete call stack retrieval. This
+function accepts three parameters:
 \begin{description}
 \item[size] Output parameter which stores the number of elements in array
 returned.
@@ -115,38 +131,52 @@ current call stack depth is 5 and [[initialDepth = 2]], then one [[malloc]]
 will be called to allocate array of two elements and two [[realloc]]s will be
 used to enlarge this array from 2 to 4 and from 4 to 8.
 \end{description}
+
+\subsubsection{Return value}
+[[GetBacktrace]] returns pointer to array of backtrace records which was
+allocated using [[malloc]], or [[NULL]] in case of failure.
+
+\subsubsection{Errors}
+\begin{description}
+\item[EDOM] Memory allocation failure occurred, this can be caused by very big
+value of [[initialDepth]] passed to function
+\item[ERANGE] [[offset]] passed to function is bigger that call stack depth, so,
+nothing can be returned.
+\end{description}
+
+\subsubsection{Example}
 Let's write sample program, which uses [[GetBacktrace]] for call stack
 retrieval. First of all, we need to include [[backtrace/backtrace.h]] header
 file.  After that we can write the function which will be indirectly called from
 [[main]] and will print current call stack:
-<<main.c>>=
+<<use-backtrace.c>>=
 #include <backtrace/backtrace.h>
 <<additional headers inclusion>>
 
 void print_backtrace()
 {
-    TBacktraceRecord* backtrace;
+    struct TBacktraceRecord* backtrace;
     <<GetBacktrace invocation>>
-    <<print backtrace here>>
+    <<print backtrace>>
     /* don't forget to free memory allocated for backtrace */
     free(backtrace);
 }
 
-int some_userful_function()
+int some_useful_function()
 {
     int everything_is_ok = 0;
     /*
         do some calculations here
         and set everithing_is_ok to 1;
      */
-    if (!everithing_is_ok)
+    if (!everything_is_ok)
         print_backtrace();
     return everything_is_ok;
 }
 
 int main()
 {
-    return some_userful_function();
+    return some_useful_function();
 }
 
 @ As [[GetBacktrace]] uses output parameter, we must declare one and pass its
@@ -154,18 +184,53 @@ address as the first parameter. [[print_backtrace]] is just an utility function
 and shouldn't print itself in call stack, so we will pass 1 as [[offset]].
 [[initialDepth]] will be set to 5 as this will be enough for our program:
 <<GetBacktrace invocation>>=
-    int size;
-    backtrace = GetBacktrace(&size, 1, 5);
+int size, i;
+backtrace = GetBacktrace(&size, 1, 5);
 
 @ In order to print information stored in TBacktraceRecord, we need to include
 [[backtrace/record.h]], which contains its definition. Since, I'm going to use
-[[printf]] as output function, we also need to include [[stdio.h]].
+[[printf]] as output function, we also need to include [[stdio.h]]. [[stdlib.h]]
+also required as is contains [[free]] function definition.
 <<additional headers inclusion>>=
 #include <backtrace/record.h>
 #include <stdio.h>
+#include <stdlib.h>
 
-@
-\end{itemize}
+@ [[TBacktraceRecord]] structure is similar to [[Dl_info]] (see [[dladdr(3)]]),
+but also contains frame pointer, so we can produce output similar to
+[[backtrace_symbols]] one:
+<<print backtrace>>=
+for (i = 0; i < size; ++i)
+{
+    /* print module name */
+    printf("%s(", backtrace[i].Module_);
+    /* check if symbol information is available */
+    if (backtrace[i].Symbol_)
+    {
+        /* print symbol name and frame offset */
+        printf("%s+0x%x",
+            backtrace[i].Symbol_,
+            backtrace[i].Frame_ - backtrace[i].SymbolAddress_);
+    }
+    /* print frame pointer */
+    printf(") [%p]\n", backtrace[i].Frame_);
+}
+
+@ That is! Now you should compile this example and link it with [[backtrace]]
+library, and don't forget to add [[-rdynamic]] to add symbol information to the
+dynamic symbol table:
+\begin{verbatim}
+gcc use-backtrace.c -lbacktrace -rdynamic
+\end{verbatim}
+
+Launch the resulting executable file and you should see output like the
+following:
+\begin{verbatim}
+./a.out(some_useful_function+0x18) [0x80487e8]
+./a.out(main+0xb) [0x80487f8]
+/lib/libc.so.6(__libc_start_main+0xf3) [0xb76f7853]
+./a.out() [0x8048621]
+\end{verbatim}
 
 \end{document}
 
