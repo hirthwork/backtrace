@@ -31,10 +31,10 @@
 
 void g(int)
 {
-    NReinventedWheels::TBacktrace backtrace =
-        NReinventedWheels::GetBacktrace(-1, 1);
+    NBacktrace::TBacktrace backtrace =
+        NBacktrace::GetBacktrace(-1, 1);
     BOOST_REQUIRE_EQUAL(backtrace[0].Symbol_,
-        "_ZN17NReinventedWheels12GetBacktraceEii");
+        "_ZN10NBacktrace12GetBacktraceEii");
     BOOST_REQUIRE_EQUAL(backtrace[1].Symbol_, "_Z1gi");
 #ifdef __FreeBSD__
     BOOST_REQUIRE_EQUAL(backtrace[2].Symbol_, "_Z1gi");
@@ -53,14 +53,14 @@ static void f()
 BOOST_AUTO_TEST_CASE(backtrace)
 {
     f();
-    BOOST_REQUIRE_EQUAL(NReinventedWheels::GetBacktrace()[0].Symbol_,
+    BOOST_REQUIRE_EQUAL(NBacktrace::GetBacktrace()[0].Symbol_,
         "_ZN9backtrace11test_methodEv");
 }
 
 BOOST_AUTO_TEST_CASE(current_frame)
 {
-    BOOST_REQUIRE_EQUAL(NReinventedWheels::TDemangledBacktraceRecord(
-        NReinventedWheels::GetCurrentFrame()).Function_,
+    BOOST_REQUIRE_EQUAL(NBacktrace::TDemangledBacktraceRecord(
+        NBacktrace::GetCurrentFrame()).Function_,
         "current_frame::test_method()");
 }
 
@@ -82,13 +82,13 @@ public:
 
 BOOST_AUTO_TEST_CASE(error_handling)
 {
-    BOOST_REQUIRE_EXCEPTION(NReinventedWheels::GetBacktrace(100),
+    BOOST_REQUIRE_EXCEPTION(NBacktrace::GetBacktrace(100),
         std::logic_error,
         TExceptionChecker("offset is bigger than call stack"));
-    BOOST_REQUIRE_EXCEPTION(NReinventedWheels::GetBacktrace(0, 0x7fffffff),
+    BOOST_REQUIRE_EXCEPTION(NBacktrace::GetBacktrace(0, 0x7fffffff),
         std::bad_alloc,
         TExceptionChecker("std::bad_alloc"));
-    BOOST_REQUIRE_EXCEPTION(NReinventedWheels::GetCurrentFrame(1000),
+    BOOST_REQUIRE_EXCEPTION(NBacktrace::GetCurrentFrame(1000),
         std::logic_error,
         TExceptionChecker("offset is bigger than call stack"));
 }

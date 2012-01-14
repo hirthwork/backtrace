@@ -26,7 +26,7 @@
 
 #include "demangle.hpp"
 
-namespace NReinventedWheels
+namespace NBacktrace
 {
     struct TDemangledBacktraceRecord
     {

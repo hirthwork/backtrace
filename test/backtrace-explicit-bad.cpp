@@ -2,6 +2,6 @@
 
 int main()
 {
-    NReinventedWheels::TBacktrace demangled = 1;
+    NBacktrace::TBacktrace demangled = 1;
 }
 

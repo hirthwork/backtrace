@@ -24,7 +24,7 @@
 
 #include "record.h"
 
-namespace NReinventedWheels
+namespace NBacktrace
 {
     TBacktraceRecord GetCurrentFrame(int offset = 0);
 

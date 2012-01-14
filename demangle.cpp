@@ -25,7 +25,7 @@
 #include "demangle.hpp"
 #include "helpers.hpp"
 
-std::string NReinventedWheels::Demangle(const char* symbol)
+std::string NBacktrace::Demangle(const char* symbol)
 {
     if(!symbol)
     {

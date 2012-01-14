@@ -4,6 +4,6 @@
 int main()
 {
     TBacktraceRecord record = {0, 0, 0, 0, 0};
-    NReinventedWheels::TDemangledBacktraceRecord demangled(record);
+    NBacktrace::TDemangledBacktraceRecord demangled(record);
 }
 

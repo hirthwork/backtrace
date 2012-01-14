@@ -24,15 +24,15 @@
 
 BOOST_AUTO_TEST_CASE(demangle)
 {
-    BOOST_REQUIRE_EQUAL(NReinventedWheels::Demangle(
+    BOOST_REQUIRE_EQUAL(NBacktrace::Demangle(
         "_ZN10test_frame11test_methodEv"), "test_frame::test_method()");
-    BOOST_REQUIRE_EQUAL(NReinventedWheels::Demangle(
-        "_ZN17NReinventedWheels15GetCurrentFrameEjb"),
-        "NReinventedWheels::GetCurrentFrame(unsigned int, bool)");
-    BOOST_REQUIRE_EQUAL(NReinventedWheels::Demangle("GetCurrentFrame"),
+    BOOST_REQUIRE_EQUAL(NBacktrace::Demangle(
+        "_ZN10NBacktrace15GetCurrentFrameEjb"),
+        "NBacktrace::GetCurrentFrame(unsigned int, bool)");
+    BOOST_REQUIRE_EQUAL(NBacktrace::Demangle("GetCurrentFrame"),
         "GetCurrentFrame");
-    BOOST_REQUIRE_EQUAL(NReinventedWheels::Demangle("_Z1fv"), "f()");
-    BOOST_REQUIRE_EQUAL(NReinventedWheels::Demangle(""), "");
-    BOOST_REQUIRE_EQUAL(NReinventedWheels::Demangle(NULL), "");
+    BOOST_REQUIRE_EQUAL(NBacktrace::Demangle("_Z1fv"), "f()");
+    BOOST_REQUIRE_EQUAL(NBacktrace::Demangle(""), "");
+    BOOST_REQUIRE_EQUAL(NBacktrace::Demangle(NULL), "");
 }
 

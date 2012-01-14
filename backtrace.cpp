@@ -32,7 +32,7 @@
 #include "backtrace.hpp"
 #include "helpers.hpp"
 
-TBacktraceRecord NReinventedWheels::GetCurrentFrame(int offset)
+TBacktraceRecord NBacktrace::GetCurrentFrame(int offset)
 {
     if (void* frame = GetFrame(offset + 1))
     {
@@ -41,7 +41,7 @@ TBacktraceRecord NReinventedWheels::GetCurrentFrame(int offset)
     throw std::logic_error("offset is bigger than call stack");
 }
 
-NReinventedWheels::TBacktrace NReinventedWheels::GetBacktrace(int offset,
+NBacktrace::TBacktrace NBacktrace::GetBacktrace(int offset,
     int initialDepth)
 {
     int size;

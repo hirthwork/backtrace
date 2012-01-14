@@ -22,7 +22,7 @@
 
 #include <string>
 
-namespace NReinventedWheels
+namespace NBacktrace
 {
     // returns symbol in case of failure or empty string if it is NULL
     std::string Demangle(const char* symbol);
