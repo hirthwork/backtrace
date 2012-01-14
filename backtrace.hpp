@@ -27,7 +27,16 @@
 namespace NReinventedWheels
 {
     TBacktraceRecord GetCurrentFrame(int offset = 0);
-    typedef std::vector<TBacktraceRecord> TBacktrace;
+
+    struct TBacktrace: std::vector<TBacktraceRecord>
+    {
+        typedef std::vector<TBacktraceRecord> TBase;
+        inline explicit TBacktrace(TBase::size_type n)
+            : TBase(n)
+        {
+        }
+    };
+
     TBacktrace GetBacktrace(int offset = 0, int initialDepth = 10);
 }
 

@@ -3,7 +3,7 @@
 
 int main()
 {
-    TBacktraceRecord record;
+    TBacktraceRecord record = {0, 0, 0, 0, 0};
     NReinventedWheels::TDemangledBacktraceRecord demangled = record;
 }
 

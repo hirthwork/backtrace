@@ -2,6 +2,8 @@ import feature : feature compose ;
 import testing ;
 import c-std ;
 
+feature c-std-test : off on ;
+
 feature testing-launcher : none valgrind : propagated composite ;
 compose <testing-launcher>valgrind
     : <testing.launcher>"valgrind --leak-check=full --error-exitcode=1 --track-origins=yes -q --suppressions=test/glibc.supp"
@@ -30,9 +32,13 @@ compile-fail malloced-explicit-bad.cpp ;
 compile demangled-explicit-good.cpp ;
 compile-fail demangled-explicit-bad.cpp ;
 
-obj test-inline : test-no-inline.c : <c-std>c89 ;
-obj test-inline : test-inline.c : <c-std>c99 ;
-obj test-inline : test-inline.c : <c-std>c1x ;
+compile backtrace-explicit-good.cpp ;
+compile-fail backtrace-explicit-bad.cpp ;
+
+obj test-inline : test-no-inline.c : <c-std-test>off ;
+obj test-inline : test-no-inline.c : <c-std-test>on <c-std>c89 ;
+obj test-inline : test-inline.c : <c-std-test>on <c-std>c99 ;
+obj test-inline : test-inline.c : <c-std-test>on <c-std>c1x ;
 run test-inline ;
 
 obj test-backtrace-c-obj : test-backtrace-c.c : <optimization>off ;

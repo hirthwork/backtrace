@@ -35,20 +35,24 @@ install backtracexx-install
 
 use-project /test : test ;
 
+alias basic-test
+    : test/<c-std-test>on
+    ;
+
 alias toolset-test
-    : test/<toolset>gcc/<toolset-gcc:version>4.6
-      test/<toolset>gcc/<toolset-gcc:version>4.7
-      test/<toolset>clang
+    : basic-test/<toolset>gcc/<toolset-gcc:version>4.6
+      basic-test/<toolset>gcc/<toolset-gcc:version>4.7
+      basic-test/<toolset>clang
     ;
 
 alias toolset-test-gcc-without-c1x
-    : test/<toolset>gcc/<toolset-gcc:version>4.3
-      test/<toolset>gcc/<toolset-gcc:version>4.4
-      test/<toolset>gcc/<toolset-gcc:version>4.5
+    : basic-test/<toolset>gcc/<toolset-gcc:version>4.3
+      basic-test/<toolset>gcc/<toolset-gcc:version>4.4
+      basic-test/<toolset>gcc/<toolset-gcc:version>4.5
     ;
 
 alias toolset-test-gcc-without-c++0x
-    : test/<toolset>gcc/<toolset-gcc:version>4.2
+    : basic-test/<toolset>gcc/<toolset-gcc:version>4.2
     ;
 
 alias c-std-test
@@ -89,6 +93,7 @@ alias mega-test : link-test ;
 
 explicit
     test
+    basic-test
     toolset-test
     toolset-test-gcc-without-c1x
     toolset-test-gcc-without-c++0x
