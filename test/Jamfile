@@ -1,18 +1,15 @@
+import feature : feature compose ;
 import testing ;
+import c-std ;
+
+feature testing-launcher : none valgrind : propagated composite ;
+compose <testing-launcher>valgrind
+    : <testing.launcher>"valgrind --leak-check=full --error-exitcode=1 --track-origins=yes -q --suppressions=test/glibc.supp"
+    ;
 
 project
     : requirements <target-os>freebsd:<include>/usr/local/include
     ;
-
-alias valgrind
-    :
-    :
-    :
-    : <testing.launcher>"valgrind --leak-check=full --error-exitcode=1 --track-origins=yes -q --suppressions=test/glibc.supp"
-    ;
-
-alias launcher : valgrind ;
-alias launcher : : <variant>coverage ;
 
 compile backtrace-double-inclusion-c.c ;
 compile backtrace-double-inclusion.cpp ;
@@ -33,8 +30,20 @@ compile-fail malloced-explicit-bad.cpp ;
 compile demangled-explicit-good.cpp ;
 compile-fail demangled-explicit-bad.cpp ;
 
-unit-test test-demangle : test-demangle.cpp ..//backtracexx launcher ;
-unit-test test-backtrace-c : test-backtrace-c.c ..//backtrace launcher ;
-unit-test test-backtrace : test-backtrace.cpp ..//backtracexx launcher ;
-unit-test test-record : test-record.cpp ..//backtracexx launcher ;
+obj test-inline : test-no-inline.c : <c-std>c89 ;
+obj test-inline : test-inline.c : <c-std>c99 ;
+obj test-inline : test-inline.c : <c-std>c1x ;
+run test-inline ;
+
+obj test-backtrace-c-obj : test-backtrace-c.c : <optimization>off ;
+unit-test test-backtrace-c : test-backtrace-c-obj ..//backtrace ;
+
+obj test-backtrace-obj : test-backtrace.cpp : <optimization>off ;
+unit-test test-backtrace : test-backtrace-obj ..//backtracexx ;
+
+obj test-demangle-obj : test-demangle.cpp : <optimization>off ;
+unit-test test-demangle : test-demangle-obj ..//backtracexx ;
+
+obj test-record-obj : test-record.cpp : <optimization>off ;
+unit-test test-record : test-record-obj ..//backtracexx ;
 

@@ -1,7 +1,7 @@
 /*
  * demangle.cpp             -- symbol demangling helper
  *
- * Copyright (C) 2011 Dmitry Potapov <potapov.d@gmail.com>
+ * Copyright (C) 2011, 2012 Dmitry Potapov <potapov.d@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

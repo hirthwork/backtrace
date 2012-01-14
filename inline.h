@@ -1,7 +1,7 @@
 /*
  * inline.h                 -- Helper define for 'include'
  *
- * Copyright (C) 2011 Dmitry Potapov <potapov.d@gmail.com>
+ * Copyright (C) 2011, 2012 Dmitry Potapov <potapov.d@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __INLINE_H_31_12_2011__
-#define __INLINE_H_31_12_2011__
+#ifndef __INLINE_H_2011_12_31__
+#define __INLINE_H_2011_12_31__
 
 #if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L)  \
     || defined(__cplusplus)

@@ -101,6 +101,7 @@ successful tests executions without failures.
 Please note that [[valrgind]] is required for test execution (or you can edit
 [[test/Jamfile]] by hands and comment out (using [[#]]) or delete line with
 words [[testing.launcher]]).
+Boost.Test is also required to be installed in order to execute tests.
 
 \section{Getting started}
 

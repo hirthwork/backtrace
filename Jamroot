@@ -1,11 +1,14 @@
 import package : install ;
+import c-std c++-std stlport ;
 
 project
-    : requirements <include>. <linkflags>-rdynamic
-      <warnings>all <cflags>-Wextra <cxxflags>-Wextra
-      <warnings-as-errors>on <cflags>-ansi <cxxflags>-ansi
+    : requirements <include>. <warnings>all <warnings-as-errors>on
       <define>_GNU_SOURCE=1
       <stdlib>stlport:<define>_GLIBCXX_HAVE_WCSFTIME=1
+      <cflags>-ansi <cxxflags>-ansi
+      <cflags>-pedantic-errors <cxxflags>-pedantic-errors
+      <cflags>-Wextra <cxxflags>-Wextra
+      <linkflags>-rdynamic
     ;
 
 lib dl : : <link>shared ;
@@ -30,50 +33,71 @@ install backtracexx-install
     : backtrace.hpp demangle.hpp record.h record.hpp
     ;
 
-alias gcc-test
-    : test/<toolset>gcc/<toolset-gcc:version>4.2
-      test/<toolset>gcc/<toolset-gcc:version>4.3
-      test/<toolset>gcc/<toolset-gcc:version>4.4
-      test/<toolset>gcc/<toolset-gcc:version>4.5
-      test/<toolset>gcc/<toolset-gcc:version>4.6
-      test/<toolset>gcc/<toolset-gcc:version>4.7
-    ;
-
-alias stdlib-test
-    : gcc-test/<stdlib>native
-      gcc-test/<stdlib>stlport
-    ;
+use-project /test : test ;
 
 alias toolset-test
-    : stdlib-test
+    : test/<toolset>gcc/<toolset-gcc:version>4.6
+      test/<toolset>gcc/<toolset-gcc:version>4.7
       test/<toolset>clang
     ;
 
+alias toolset-test-gcc-without-c1x
+    : test/<toolset>gcc/<toolset-gcc:version>4.3
+      test/<toolset>gcc/<toolset-gcc:version>4.4
+      test/<toolset>gcc/<toolset-gcc:version>4.5
+    ;
+
+alias toolset-test-gcc-without-c++0x
+    : test/<toolset>gcc/<toolset-gcc:version>4.2
+    ;
+
+alias c-std-test
+    : toolset-test/<c-std>c89
+      toolset-test/<c-std>c99
+      toolset-test/<c-std>c1x
+      toolset-test-gcc-without-c1x/<c-std>c89
+      toolset-test-gcc-without-c1x/<c-std>c99
+    ;
+
+alias c++-std-test
+    : c-std-test/<c++-std>c++98
+      c-std-test/<c++-std>c++0x
+      toolset-test-gcc-without-c++0x/<c-std>c89/<c++-std>c++98
+      toolset-test-gcc-without-c++0x/<c-std>c99/<c++-std>c++98
+    ;
+
+alias stdlib-test
+    : c++-std-test/<stdlib>native
+      c++-std-test/<stdlib>stlport
+    ;
+
+alias variant-test
+    : stdlib-test/<variant>debug
+      stdlib-test/<variant>release
+    ;
+
+alias launcher-test
+    : variant-test/<testing-launcher>valgrind
+    ;
+
 alias link-test
-    : toolset-test/<link>static
-      toolset-test/<link>shared
+    : launcher-test/<link>static
+      launcher-test/<link>shared
     ;
 
-alias threading-test
-    : link-test/<threading>single
-      link-test/<threading>multi
-    ;
-
-alias runtime-test
-    : threading-test/<runtime-debugging>on
-      threading-test/<runtime-debugging>off
-    ;
-
-alias mega-test : runtime-test ;
+alias mega-test : link-test ;
 
 explicit
     test
-    gcc-test
-    stdlib-test
     toolset-test
+    toolset-test-gcc-without-c1x
+    toolset-test-gcc-without-c++0x
+    c-std-test
+    c++-std-test
+    stdlib-test
+    variant-test
+    launcher-test
     link-test
-    threading-test
-    runtime-test
     mega-test
     ;
 

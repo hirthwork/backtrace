@@ -1,7 +1,7 @@
 /*
  * extract.h                -- TBacktraceRecord extraction routine
  *
- * Copyright (C) 2011 Dmitry Potapov <potapov.d@gmail.com>
+ * Copyright (C) 2011, 2012 Dmitry Potapov <potapov.d@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __EXTRACT_H_31_12_2011__
-#define __EXTRACT_H_31_12_2011__
+#ifndef __EXTRACT_H_2011_12_31__
+#define __EXTRACT_H_2011_12_31__
 
 #include <dlfcn.h>
 

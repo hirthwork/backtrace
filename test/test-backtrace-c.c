@@ -1,7 +1,7 @@
 /*
  * test-backtrace-c.c       -- backtrace functions tests
  *
- * Copyright (C) 2011 Dmitry Potapov <potapov.d@gmail.com>
+ * Copyright (C) 2011, 2012 Dmitry Potapov <potapov.d@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,31 +18,12 @@
  */
 
 #include <errno.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 #include <backtrace.h>
 #include <record.h>
 
-#define REQUIRE_EQUAL(first, second)                        \
-    if (first != second) {                                  \
-        printf("%s:%d: assertion failed \"%d\" != \"%d\"\n",\
-            __FILE__, __LINE__, (int)first, second);        \
-        return 1; }
-
-#define REQUIRE_NOT_EQUAL(first, second)                    \
-    if (first == second) {                                  \
-        printf("%s:%d: assertion failed \"%d\" == \"%d\"\n",\
-            __FILE__, __LINE__, (int)first, second);        \
-        return 1; }
-
-#define REQUIRE_STRINGS_EQUAL(first, second)                \
-    if ((void*)first != (void*)second && (!first || !second \
-        || strcmp(first, second))) {                        \
-        printf("%s:%d: assertion failed \"%s\" != \"%s\"\n",\
-            __FILE__, __LINE__, first, second);             \
-        return 1; }
+#include "checks.h"
 
 static int TestGetCurrentFrameStatic()
 {
