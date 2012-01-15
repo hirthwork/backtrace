@@ -126,11 +126,11 @@ which is calling [[GetBacktrace]]). In this case 1 can be passed as [[offset]].
 Pass 0 here if you want to receive the complete call stack.
 \item[initialDepth] Expected call stack depth. [[Backtrace]] will allocate array
 of [[initialDepth]] elements to store call stack. If call stack depth is bigger
-than size of currently allocated array is not enough to store call stack,
-[[backtrace]] will call [[realloc]] with doubled capacity. For example, if
-current call stack depth is 5 and [[initialDepth = 2]], then one [[malloc]]
-will be called to allocate array of two elements and two [[realloc]]s will be
-used to enlarge this array from 2 to 4 and from 4 to 8.
+than size of currently allocated array, [[backtrace]] will call [[realloc]] with
+doubled capacity. For example, if current call stack depth is 5 and
+[[initialDepth = 2]], then one [[malloc]] will be called to allocate array of
+two elements and two [[realloc]]s will be used to enlarge this array from 2 to 4
+and from 4 to 8.
 \end{description}
 
 \subsubsection{Return value}
@@ -177,7 +177,8 @@ int some_useful_function()
 
 int main()
 {
-    return some_useful_function();
+    some_useful_function();
+    return 0;
 }
 
 @ As [[GetBacktrace]] uses output parameter, we must declare one and pass its
@@ -191,16 +192,20 @@ backtrace = GetBacktrace(&size, 1, 5);
 @ In order to print information stored in TBacktraceRecord, we need to include
 [[backtrace/record.h]], which contains its definition. Since, I'm going to use
 [[printf]] as output function, we also need to include [[stdio.h]]. [[stdlib.h]]
-also required as is contains [[free]] function definition.
+also required as is contains [[free]] function definition. Some assertions will
+be used, too.
 <<additional headers inclusion>>=
 #include <backtrace/record.h>
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
-
 @ [[TBacktraceRecord]] structure is similar to [[Dl_info]] (see [[dladdr(3)]]),
 but also contains frame pointer, so we can produce output similar to
-[[backtrace_symbols]] one:
+[[backtrace_symbols]] one. First of all, we need to check [[GetBacktrace]]
+return value:
 <<print backtrace>>=
+assert(backtrace);
+assert(size >= 2); /* main & some_useful_function */
 for (i = 0; i < size; ++i)
 {
     /* print module name */
@@ -209,9 +214,9 @@ for (i = 0; i < size; ++i)
     if (backtrace[i].Symbol_)
     {
         /* print symbol name and frame offset */
-        printf("%s+0x%x",
-            backtrace[i].Symbol_,
-            backtrace[i].Frame_ - backtrace[i].SymbolAddress_);
+        int offset = (const char*)backtrace[i].Frame_
+            - (const char*)backtrace[i].SymbolAddress_;
+        printf("%s+0x%x", backtrace[i].Symbol_, offset);
     }
     /* print frame pointer */
     printf(") [%p]\n", backtrace[i].Frame_);

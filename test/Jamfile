@@ -1,6 +1,7 @@
 import feature : feature compose ;
 import testing ;
 import c-std ;
+import noweb ;
 
 feature c-std-test : off on ;
 
@@ -52,4 +53,6 @@ unit-test test-demangle : test-demangle-obj ..//backtracexx ;
 
 obj test-record-obj : test-record.cpp : <optimization>off ;
 unit-test test-record : test-record-obj ..//backtracexx ;
+
+unit-test use-backtrace : ../README.nw ..//backtrace : <chunk>use-backtrace.c ;
 

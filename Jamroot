@@ -1,5 +1,6 @@
 import package : install ;
 import c-std c++-std stlport ;
+import noweb ;
 
 project
     : requirements <include>. <warnings>all <warnings-as-errors>on
