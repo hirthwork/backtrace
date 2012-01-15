@@ -6,15 +6,16 @@ import noweb ;
 
 use-project /test-base : test-base ;
 
-unit-test use-backtrace
-    : ../doc/README.nw ..//backtrace
-    : <chunk>use-backtrace.c
-      <chunk-type>c
-    ;
+c use-backtrace.c : ../doc/README.nw : <chunk>use-backtrace.c ;
+unit-test use-backtrace : use-backtrace.c ..//backtrace ;
+
+c current-frame.c : ../doc/README.nw : <chunk>current-frame.c ;
+unit-test current-frame : current-frame.c ..//backtrace ;
 
 alias basic-test
     : test-base/<c-std-test>on
       use-backtrace
+      current-frame
     ;
 
 alias toolset-test

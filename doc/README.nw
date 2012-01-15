@@ -4,10 +4,9 @@
 
 \documentclass{article}
 \usepackage{noweb}
-\usepackage{hyperref}
+\usepackage[colorlinks=true, linkcolor=blue, urlcolor=black]{hyperref}
 \begin{document}
-\author{Dmitry Potapov\\
-[[potapov.d@gmail.com]]}
+\author{\href{mailto:potapov.d@gmail.com}{Dmitry Potapov}}
 \title{Backtrace helper library}
 \maketitle
 
@@ -189,11 +188,9 @@ backtrace = GetBacktrace(&size, 1, 5);
 @ In order to print information stored in TBacktraceRecord, we need to include
 [[backtrace/record.h]], which contains its definition. Since, I'm going to use
 [[printf]] as output function, we also need to include [[stdio.h]]. [[stdlib.h]]
-also required as is contains [[free]] function definition. Some assertions will
-be used, too.
+also required as is contains [[free]] function definition.
 <<additional headers inclusion>>=
 #include <backtrace/record.h>
-#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -202,8 +199,13 @@ but also contains frame pointer, so we can produce output similar to
 [[backtrace_symbols]] one. First of all, we need to check [[GetBacktrace]]
 return value:
 <<print backtrace>>=
-assert(backtrace);
-assert(size >= 2); /* main & some_useful_function */
+/* handle possible errors */
+if (!backtrace)
+    exit(EXIT_FAILURE);
+
+if (size < 2) /* main & some_useful_function */
+    exit(EXIT_FAILURE);
+
 for (i = 0; i < size; ++i)
 {
     /* print module name */
@@ -234,6 +236,77 @@ following:
 ./a.out(main+0xb) [0x80487f8]
 /lib/libc.so.6(__libc_start_main+0xf3) [0xb76f7853]
 ./a.out() [0x8048621]
+\end{verbatim}
+
+\subsection{[[GetCurrentFrame]] function}
+
+\subsubsection{Synopsis}
+\small{\begin{verbatim}
+#include <backtrace/backtrace.h>
+
+int GetCurrentFrame(struct TBacktraceRecord* record, int offset);
+\end{verbatim}}
+
+\subsubsection{Description}
+[[GetCurrentFrame]] function is used sigle call stack frame retrieval. This
+function accepts two parameters:
+\begin{description}
+\item[record] Is used to store call stack frame information.
+\item[offset] Number of call stack frames to skip. 0 means that function called
+[[GetCurrentFrame]] will be returned. 1 means that the second function in call
+stack will be returned. etc.
+\end{description}
+
+\subsubsection{Return value}
+[[GetCurrentFrame]] returns 0 if offset is bigger than call stack depth, 1
+otherwise, [[record]] will contain frame information in this case.
+
+\subsubsection{Example}
+I'm going to write sample program which calls [[GetCurrentFrame]] and prints
+symbol name. As with [[GetBacktrace]] in order to use [[GetCurrentFrame]] header
+file [[backtrace/backtrace.h]] must be included.
+<<current-frame.c>>=
+#include <backtrace/backtrace.h>
+<<other headers>>
+
+void nested_function()
+{
+    struct TBacktraceRecord record;
+    <<print current function name>>
+    <<print main function name>>
+}
+
+int main()
+{
+    nested_function();
+    return 0;
+}
+
+@ As we going to print information from [[TBacktraceRecord]], we need to include
+[[backtrace/record.h]] file. [[stdio.h]] is needed either for symbols names
+printing. [[stdlib.h]] is used for error reporting.
+<<other headers>>=
+#include <backtrace/record.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+@ Now, we can retrieve current function name by passing 0 as [[offset]]:
+<<print current function name>>=
+if (!GetCurrentFrame(&record, 0))
+    exit(EXIT_FAILURE);
+puts(record.Symbol_);
+
+@ Symbol name of calling function([[main]]) can be retrieved by passing 1 as
+[[offset]].
+<<print main function name>>=
+if (!GetCurrentFrame(&record, 1))
+    exit(EXIT_FAILURE);
+puts(record.Symbol_);
+
+@ Compile and run the resulting program. The output should be like this:
+\begin{verbatim}
+nested_function
+main
 \end{verbatim}
 
 \end{document}
