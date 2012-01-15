@@ -19,6 +19,7 @@ alias libs : : <target-os>freebsd ;
 
 lib backtrace : backtrace-c.c frames.c libs ;
 lib backtracexx : backtrace.cpp demangle.cpp backtrace ;
+tex doc : README.nw : <delay>on ;
 
 install backtrace-install
     : <install-header-subdir>backtrace

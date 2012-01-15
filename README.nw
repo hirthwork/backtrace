@@ -98,9 +98,6 @@ In this case, unit-tests will be built, executed and their status will be
 reported.  For most users it is enough to check the return code of the command
 specified above. As for most Linux utilities zero return code states for
 successful tests executions without failures.
-Please note that [[valrgind]] is required for test execution (or you can edit
-[[test/Jamfile]] by hands and comment out (using [[#]]) or delete line with
-words [[testing.launcher]]).
 Boost.Test is also required to be installed in order to execute tests.
 
 \section{Getting started}
@@ -199,6 +196,7 @@ be used, too.
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+
 @ [[TBacktraceRecord]] structure is similar to [[Dl_info]] (see [[dladdr(3)]]),
 but also contains frame pointer, so we can produce output similar to
 [[backtrace_symbols]] one. First of all, we need to check [[GetBacktrace]]
