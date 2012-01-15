@@ -1,0 +1,88 @@
+import testing ;
+import c-std ;
+import c++-std ;
+import stlport ;
+import noweb ;
+
+use-project /test-base : test-base ;
+
+unit-test use-backtrace
+    : ../doc/README.nw ..//backtrace
+    : <chunk>use-backtrace.c
+      <chunk-type>c
+    ;
+
+alias basic-test
+    : test-base/<c-std-test>on
+      use-backtrace
+    ;
+
+alias toolset-test
+    : basic-test/<toolset>gcc/<toolset-gcc:version>4.6
+      basic-test/<toolset>gcc/<toolset-gcc:version>4.7
+      basic-test/<toolset>clang
+    ;
+
+alias toolset-test-gcc-without-c1x
+    : basic-test/<toolset>gcc/<toolset-gcc:version>4.3
+      basic-test/<toolset>gcc/<toolset-gcc:version>4.4
+      basic-test/<toolset>gcc/<toolset-gcc:version>4.5
+    ;
+
+alias toolset-test-gcc-without-c++0x
+    : basic-test/<toolset>gcc/<toolset-gcc:version>4.2
+    ;
+
+alias c-std-test
+    : toolset-test/<c-std>c89
+      toolset-test/<c-std>c99
+      toolset-test/<c-std>c1x
+      toolset-test-gcc-without-c1x/<c-std>c89
+      toolset-test-gcc-without-c1x/<c-std>c99
+    ;
+
+alias c++-std-test
+    : c-std-test/<c++-std>c++98
+      c-std-test/<c++-std>c++0x
+      toolset-test-gcc-without-c++0x/<c-std>c89/<c++-std>c++98
+      toolset-test-gcc-without-c++0x/<c-std>c99/<c++-std>c++98
+    ;
+
+alias stdlib-test
+    : c++-std-test/<stdlib>native
+      c++-std-test/<stdlib>stlport
+    ;
+
+alias variant-test
+    : stdlib-test/<variant>debug
+      stdlib-test/<variant>release
+    ;
+
+alias launcher-test
+    : variant-test/<testing-launcher>valgrind
+    ;
+
+alias link-test
+    : launcher-test/<link>static
+      launcher-test/<link>shared
+    ;
+
+alias mega-test : link-test ;
+
+explicit
+    use-backtrace
+    test-base
+    basic-test
+    toolset-test
+    toolset-test-gcc-without-c1x
+    toolset-test-gcc-without-c++0x
+    c-std-test
+    c++-std-test
+    stdlib-test
+    variant-test
+    launcher-test
+    link-test
+    mega-test
+    ;
+
+

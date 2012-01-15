@@ -1,6 +1,4 @@
 import package : install ;
-import c-std c++-std stlport ;
-import noweb ;
 
 project
     : requirements <include>. <warnings>all <warnings-as-errors>on
@@ -19,7 +17,6 @@ alias libs : : <target-os>freebsd ;
 
 lib backtrace : backtrace-c.c frames.c libs ;
 lib backtracexx : backtrace.cpp demangle.cpp backtrace ;
-tex doc : README.nw : <delay>on ;
 
 install backtrace-install
     : <install-header-subdir>backtrace
@@ -35,76 +32,11 @@ install backtracexx-install
     : backtrace.hpp demangle.hpp record.h record.hpp
     ;
 
-use-project /test : test ;
+alias user-manual : doc//user-manual ;
+package.install-data user-manual-install : doc/backtrace : user-manual ;
+explicit user-manual user-manual-install ;
 
-alias basic-test
-    : test/<c-std-test>on
-    ;
-
-alias toolset-test
-    : basic-test/<toolset>gcc/<toolset-gcc:version>4.6
-      basic-test/<toolset>gcc/<toolset-gcc:version>4.7
-      basic-test/<toolset>clang
-    ;
-
-alias toolset-test-gcc-without-c1x
-    : basic-test/<toolset>gcc/<toolset-gcc:version>4.3
-      basic-test/<toolset>gcc/<toolset-gcc:version>4.4
-      basic-test/<toolset>gcc/<toolset-gcc:version>4.5
-    ;
-
-alias toolset-test-gcc-without-c++0x
-    : basic-test/<toolset>gcc/<toolset-gcc:version>4.2
-    ;
-
-alias c-std-test
-    : toolset-test/<c-std>c89
-      toolset-test/<c-std>c99
-      toolset-test/<c-std>c1x
-      toolset-test-gcc-without-c1x/<c-std>c89
-      toolset-test-gcc-without-c1x/<c-std>c99
-    ;
-
-alias c++-std-test
-    : c-std-test/<c++-std>c++98
-      c-std-test/<c++-std>c++0x
-      toolset-test-gcc-without-c++0x/<c-std>c89/<c++-std>c++98
-      toolset-test-gcc-without-c++0x/<c-std>c99/<c++-std>c++98
-    ;
-
-alias stdlib-test
-    : c++-std-test/<stdlib>native
-      c++-std-test/<stdlib>stlport
-    ;
-
-alias variant-test
-    : stdlib-test/<variant>debug
-      stdlib-test/<variant>release
-    ;
-
-alias launcher-test
-    : variant-test/<testing-launcher>valgrind
-    ;
-
-alias link-test
-    : launcher-test/<link>static
-      launcher-test/<link>shared
-    ;
-
-alias mega-test : link-test ;
-
-explicit
-    test
-    basic-test
-    toolset-test
-    toolset-test-gcc-without-c1x
-    toolset-test-gcc-without-c++0x
-    c-std-test
-    c++-std-test
-    stdlib-test
-    variant-test
-    launcher-test
-    link-test
-    mega-test
-    ;
+alias test : tests//test-base ;
+alias mega-test : tests//mega-test ;
+explicit test mega-test ;
 

@@ -1,0 +1,4 @@
+import noweb ;
+
+tex user-manual : README.nw : <delay>on ;
+

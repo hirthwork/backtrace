@@ -1,13 +1,12 @@
 import feature : feature compose ;
 import testing ;
 import c-std ;
-import noweb ;
 
 feature c-std-test : off on ;
 
 feature testing-launcher : none valgrind : propagated composite ;
 compose <testing-launcher>valgrind
-    : <testing.launcher>"valgrind --leak-check=full --error-exitcode=1 --track-origins=yes -q --suppressions=test/glibc.supp"
+    : <testing.launcher>"valgrind --leak-check=full --error-exitcode=1 --track-origins=yes -q --suppressions=tests/test-base/glibc.supp"
     ;
 
 project
@@ -42,17 +41,18 @@ obj test-inline : test-inline.c : <c-std-test>on <c-std>c99 ;
 obj test-inline : test-inline.c : <c-std-test>on <c-std>c1x ;
 run test-inline ;
 
+alias backtrace : ../..//backtrace ;
+alias backtracexx : ../..//backtracexx ;
+
 obj test-backtrace-c-obj : test-backtrace-c.c : <optimization>off ;
-unit-test test-backtrace-c : test-backtrace-c-obj ..//backtrace ;
+unit-test test-backtrace-c : test-backtrace-c-obj backtrace ;
 
 obj test-backtrace-obj : test-backtrace.cpp : <optimization>off ;
-unit-test test-backtrace : test-backtrace-obj ..//backtracexx ;
+unit-test test-backtrace : test-backtrace-obj backtracexx ;
 
 obj test-demangle-obj : test-demangle.cpp : <optimization>off ;
-unit-test test-demangle : test-demangle-obj ..//backtracexx ;
+unit-test test-demangle : test-demangle-obj backtracexx ;
 
 obj test-record-obj : test-record.cpp : <optimization>off ;
-unit-test test-record : test-record-obj ..//backtracexx ;
-
-unit-test use-backtrace : ../README.nw ..//backtrace : <chunk>use-backtrace.c ;
+unit-test test-record : test-record-obj backtracexx ;
 
