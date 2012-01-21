@@ -20,8 +20,8 @@
 #include <errno.h>
 #include <stdlib.h>
 
-#include <backtrace.h>
-#include <record.h>
+#include <backtrace/backtrace.h>
+#include <backtrace/record.h>
 
 #include "checks.h"
 

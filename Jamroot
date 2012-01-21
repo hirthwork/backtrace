@@ -1,4 +1,4 @@
-import package : install ;
+import package ;
 
 project
     : requirements <include>. <warnings>all <warnings-as-errors>on
@@ -10,27 +10,7 @@ project
       <linkflags>-rdynamic
     ;
 
-lib dl : : <link>shared ;
-
-alias libs : dl ;
-alias libs : : <target-os>freebsd ;
-
-lib backtrace : backtrace-c.c frames.c libs ;
-lib backtracexx : backtrace.cpp demangle.cpp backtrace ;
-
-install backtrace-install
-    : <install-header-subdir>backtrace
-    :
-    : backtrace
-    : backtrace.h record.h
-    ;
-
-install backtracexx-install
-    : <install-header-subdir>backtrace
-    :
-    : backtracexx
-    : backtrace.hpp demangle.hpp record.h record.hpp
-    ;
+use-project /backtrace : backtrace ;
 
 alias user-manual : doc//user-manual ;
 package.install-data user-manual-install : doc/backtrace : user-manual ;

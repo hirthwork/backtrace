@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <record.hpp>
+#include <backtrace/record.hpp>
 
 #define BOOST_TEST_MODULE RecordTest
 #include <boost/test/included/unit_test.hpp>

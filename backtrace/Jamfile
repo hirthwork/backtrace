@@ -1,0 +1,25 @@
+import package ;
+
+lib dl : : <link>shared ;
+
+alias libs : dl ;
+alias libs : : <target-os>freebsd ;
+
+lib backtrace : backtrace-c.c frames.c libs ;
+lib backtracexx
+    : backtrace.cpp current-frame.cpp demangle.cpp record.cpp backtrace ;
+
+package.install backtrace-install
+    : <install-header-subdir>backtrace
+    :
+    : backtrace
+    : backtrace.h record.h
+    ;
+
+package.install backtracexx-install
+    : <install-header-subdir>backtrace
+    :
+    : backtracexx
+    : backtrace.hpp current-frame.hpp record.h record.hpp
+    ;
+

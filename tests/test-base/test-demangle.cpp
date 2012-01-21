@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <demangle.hpp>
+#include <backtrace/demangle.hpp>
 
 #define BOOST_TEST_MODULE DemangleTest
 #include <boost/test/included/unit_test.hpp>

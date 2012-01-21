@@ -6,6 +6,11 @@ import noweb ;
 
 use-project /test-base : test-base ;
 
+unit-test print-function
+    : ../doc/README.nw ..//backtrace
+    : <chunk>print-function.cpp <chunk-type>cpp
+    ;
+
 unit-test use-backtrace
     : ../doc/README.nw ..//backtrace
     : <chunk>use-backtrace.c
@@ -18,6 +23,7 @@ unit-test current-frame
 
 alias basic-test
     : test-base/<c-std-test>on
+      print-function
       use-backtrace
       current-frame
     ;
@@ -46,6 +52,7 @@ alias link-test
 alias mega-test : link-test ;
 
 explicit
+    print-function
     use-backtrace
     current-frame
     test-base

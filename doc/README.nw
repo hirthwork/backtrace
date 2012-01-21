@@ -12,6 +12,8 @@
 
 \tableofcontents
 
+\pagebreak
+
 \section{Introduction}
 The purpose of this library is to provide APIs for current program call
 stack retrieval in handy and painless manner.
@@ -45,28 +47,28 @@ well as on any non-BSD Unix distribution)
 Change your current working directory to [[backtrace]] source distribution root
 and execute the following command:
 \begin{verbatim}
-bjam backtrace-install release
+bjam /backtrace//backtrace-install release
 \end{verbatim}
 
 After this [[backtrace]] library will be built and installed among with required
 headers. The default installation prefix is [[/usr/local]] which can be
 overridden using [[--prefix=<installation path>]] option:
 \begin{verbatim}
-bjam backtrace-install release --prefix=/usr
+bjam /backtrace//backtrace-install release --prefix=/usr
 \end{verbatim}
 
 \subsection{C++-library installation}
 Change your current working directory to [[backtrace]] source distribution root
 and execute the following command:
 \begin{verbatim}
-bjam backtracexx-install release
+bjam /backtrace//backtracexx-install release
 \end{verbatim}
 
 As with the pure C library installation, library and headers will be installed
 to [[/usr/local]] by default. Both pure C and C++ versions can be installed
 using the following command:
 \begin{verbatim}
-bjam backtrace-install backtracexx-install release
+bjam /backtrace//backtrace-install /backtrace//backtracexx-install release
 \end{verbatim}
 
 \subsection{Other installation options}
@@ -76,14 +78,14 @@ bjam backtrace-install backtracexx-install release
 bjam invocation command. It is possible to build and install static and shared
 libraries with single command:
 \begin{verbatim}
-bjam backtracexx-install release link=static,shared
+bjam /backtrace//backtracexx-install release link=static,shared
 \end{verbatim}
 
 \subsubsection{Debug version installation}
 Debug version of [[backtrace]] library can be installed by invoking installation
 command without specifying [[release]] build variant in command line:
 \begin{verbatim}
-bjam backtrace-install
+bjam /backtrace//backtrace-install
 \end{verbatim}
 
 \subsection{Sanity testing}
@@ -99,12 +101,54 @@ specified above. As for most Linux utilities zero return code states for
 successful tests executions without failures.
 Boost.Test is also required to be installed in order to execute tests.
 
-\section{Getting started}
+\section{Quick Example}
+
+Here the quick example that will print current function demangled name.
+The brief description will be given later.
+
+<<print-function.cpp>>=
+#include <iostream>
+#include <backtrace/current-frame.hpp>
+#include <backtrace/record.h>   // simple backtrace record
+#include <backtrace/record.hpp> // demangled backtrace record
+
+struct TMyStruct {
+    void Function() const {
+        using namespace NBacktrace;
+        TBacktraceRecord record(GetCurrentFrame());
+        TDemangledBacktraceRecord demangledRecord(record);
+        std::cout << "function: "
+            << demangledRecord.Function_ << std::endl;
+    }
+};
+
+int main()
+{
+    TMyStruct().Function();
+}
+
+@ Now compile and link this program using the following command
+\begin{verbatim}
+gcc print-function.cpp -lbacktrace -lbacktracexx -rdynamic
+\end{verbatim}
+
+Launch the resulting binary. The output should be like the following:
+\begin{verbatim}
+function: TMyStruct::Function() const
+\end{verbatim}
+
+So, what does this program doing? First of all, we calls [[GetCurrentFrame]]
+function, which obviously returns current frame information stored in
+[[TBacktraceRecord]] structure. This structure doesn't perform symbol
+demangling, so we're converting it to [[TDemangledBacktraceRecord]]. Now, the
+function name is available and can be printed to the standard output.
+
+\section{Reference}
 
 \subsection{[[GetBacktrace]] function}
 
 \subsubsection{Synopsis}
-\small{\begin{verbatim}
+{\small\begin{verbatim}
 #include <backtrace/backtrace.h>
 
 TBacktraceRecord* GetBacktrace(int* size, int offset, int initialDepth);
@@ -241,7 +285,7 @@ following:
 \subsection{[[GetCurrentFrame]] function}
 
 \subsubsection{Synopsis}
-\small{\begin{verbatim}
+{\small\begin{verbatim}
 #include <backtrace/backtrace.h>
 
 int GetCurrentFrame(struct TBacktraceRecord* record, int offset);

@@ -17,51 +17,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <new>
 #include <stdexcept>
 
-#include <backtrace/backtrace.hpp>
+#include <backtrace/current-frame.hpp>
+#include <backtrace/record.hpp>
 
-#define BOOST_TEST_MODULE BacktraceTest
+#define BOOST_TEST_MODULE CurrentFrameTest
 #include <boost/test/included/unit_test.hpp>
 
 #include "exception-checker.hpp"
 
-void g(int)
+BOOST_AUTO_TEST_CASE(current_frame)
 {
-    NBacktrace::TBacktrace backtrace =
-        NBacktrace::GetBacktrace(-1, 1);
-    BOOST_REQUIRE_EQUAL(backtrace[0].Symbol_,
-        "_ZN10NBacktrace12GetBacktraceEii");
-    BOOST_REQUIRE_EQUAL(backtrace[1].Symbol_, "_Z1gi");
-#ifdef __FreeBSD__
-    BOOST_REQUIRE_EQUAL(backtrace[2].Symbol_, "_Z1gi");
-#else
-    BOOST_REQUIRE(backtrace[2].Symbol_ == NULL);
-#endif
-    BOOST_REQUIRE_EQUAL(backtrace[3].Symbol_,
-        "_ZN9backtrace11test_methodEv");
-}
-
-static void f()
-{
-    g(5);
-}
-
-BOOST_AUTO_TEST_CASE(backtrace)
-{
-    f();
-    BOOST_REQUIRE_EQUAL(NBacktrace::GetBacktrace()[0].Symbol_,
-        "_ZN9backtrace11test_methodEv");
+    BOOST_REQUIRE_EQUAL(NBacktrace::TDemangledBacktraceRecord(
+        NBacktrace::GetCurrentFrame()).Function_,
+        "current_frame::test_method()");
 }
 
 BOOST_AUTO_TEST_CASE(error_handling)
 {
-    BOOST_REQUIRE_EXCEPTION(NBacktrace::GetBacktrace(100),
+    BOOST_REQUIRE_EXCEPTION(NBacktrace::GetCurrentFrame(1000),
         std::logic_error,
         TExceptionChecker("offset is bigger than call stack"));
-    BOOST_REQUIRE_EXCEPTION(NBacktrace::GetBacktrace(0, 0x7fffffff),
-        std::bad_alloc,
-        TExceptionChecker("std::bad_alloc"));
 }
 

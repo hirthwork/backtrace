@@ -1,4 +1,4 @@
 import noweb ;
 
-tex user-manual : README.nw : <delay>on <autodefs>c ;
+tex user-manual : README.nw : <delay>on ;
 

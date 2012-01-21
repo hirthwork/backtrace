@@ -15,13 +15,14 @@ project
 
 compile backtrace-double-inclusion-c.c ;
 compile backtrace-double-inclusion.cpp ;
-compile inline-double-inclusion-c.c ;
-compile inline-double-inclusion.cpp ;
+compile current-frame-double-inclusion.cpp ;
 compile demangle-double-inclusion.cpp ;
 compile extract-double-inclusion-c.c ;
 compile extract-double-inclusion.cpp ;
 compile frames-double-inclusion.c ;
 compile helpers-double-inclusion.cpp ;
+compile inline-double-inclusion-c.c ;
+compile inline-double-inclusion.cpp ;
 compile record-double-inclusion-c.c ;
 compile record-double-inclusion.cpp ;
 compile unwind-double-inclusion.c ;
@@ -41,14 +42,17 @@ obj test-inline : test-inline.c : <c-std-test>on <c-std>c99 ;
 obj test-inline : test-inline.c : <c-std-test>on <c-std>c1x ;
 run test-inline ;
 
-alias backtrace : ../..//backtrace ;
-alias backtracexx : ../..//backtracexx ;
+alias backtrace : /backtrace//backtrace ;
+alias backtracexx : /backtrace//backtracexx ;
 
 obj test-backtrace-c-obj : test-backtrace-c.c : <optimization>off ;
 unit-test test-backtrace-c : test-backtrace-c-obj backtrace ;
 
 obj test-backtrace-obj : test-backtrace.cpp : <optimization>off ;
 unit-test test-backtrace : test-backtrace-obj backtracexx ;
+
+obj test-current-frame-obj : test-current-frame.cpp : <optimization>off ;
+unit-test test-current-frame : test-current-frame-obj backtracexx ;
 
 obj test-demangle-obj : test-demangle.cpp : <optimization>off ;
 unit-test test-demangle : test-demangle-obj backtracexx ;

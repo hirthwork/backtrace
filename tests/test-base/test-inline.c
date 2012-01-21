@@ -1,4 +1,4 @@
-#include <inline.h>
+#include <backtrace/inline.h>
 #include "checks.h"
 
 int main()

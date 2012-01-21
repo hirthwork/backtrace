@@ -32,15 +32,6 @@
 #include "backtrace.hpp"
 #include "helpers.hpp"
 
-TBacktraceRecord NBacktrace::GetCurrentFrame(int offset)
-{
-    if (void* frame = GetFrame(offset + 1))
-    {
-        return ExtractBacktraceRecord(frame);
-    }
-    throw std::logic_error("offset is bigger than call stack");
-}
-
 NBacktrace::TBacktrace NBacktrace::GetBacktrace(int offset,
     int initialDepth)
 {

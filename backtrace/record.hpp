@@ -1,5 +1,5 @@
 /*
- * backtrace.hpp            -- backtrace helper
+ * record.hpp               -- demangled backtrace information atom
  *
  * Copyright (C) 2011, 2012 Dmitry Potapov <potapov.d@gmail.com>
  *
@@ -17,27 +17,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __BACKTRACE_HPP_2011_09_20__
-#define __BACKTRACE_HPP_2011_09_20__
+#ifndef __RECORD_HPP_2011_09_20__
+#define __RECORD_HPP_2011_09_20__
 
-#include <vector>
+#include <string>
 
 #include "record.h"
 
 namespace NBacktrace
 {
-    TBacktraceRecord GetCurrentFrame(int offset = 0);
-
-    struct TBacktrace: std::vector<TBacktraceRecord>
+    struct TDemangledBacktraceRecord: TBacktraceRecord
     {
-        typedef std::vector<TBacktraceRecord> TBase;
-        inline explicit TBacktrace(TBase::size_type n)
-            : TBase(n)
-        {
-        }
-    };
+        // same as Symbol_ if demangling failed or empty string if no symbol
+        // information available
+        const std::string Function_;
 
-    TBacktrace GetBacktrace(int offset = 0, int initialDepth = 10);
+        explicit TDemangledBacktraceRecord(const TBacktraceRecord& record);
+    };
 }
 
 #endif
