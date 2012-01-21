@@ -17,6 +17,7 @@ package.install-data user-manual-install : doc/backtrace : user-manual ;
 explicit user-manual user-manual-install ;
 
 alias test : tests//test-base ;
+alias basic-test : tests//basic-test ;
 alias mega-test : tests//mega-test ;
 explicit test mega-test ;
 
