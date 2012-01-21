@@ -6,11 +6,15 @@ import noweb ;
 
 use-project /test-base : test-base ;
 
-c use-backtrace.c : ../doc/README.nw : <chunk>use-backtrace.c ;
-unit-test use-backtrace : use-backtrace.c ..//backtrace ;
+unit-test use-backtrace
+    : ../doc/README.nw ..//backtrace
+    : <chunk>use-backtrace.c
+    ;
 
-c current-frame.c : ../doc/README.nw : <chunk>current-frame.c ;
-unit-test current-frame : current-frame.c ..//backtrace ;
+unit-test current-frame
+    : ../doc/README.nw ..//backtrace
+    : <chunk>current-frame.c
+    ;
 
 alias basic-test
     : test-base/<c-std-test>on
@@ -18,40 +22,11 @@ alias basic-test
       current-frame
     ;
 
-alias toolset-test
-    : basic-test/<toolset>gcc/<toolset-gcc:version>4.6
-      basic-test/<toolset>gcc/<toolset-gcc:version>4.7
-      basic-test/<toolset>clang
-    ;
-
-alias toolset-test-gcc-without-c1x
-    : basic-test/<toolset>gcc/<toolset-gcc:version>4.3
-      basic-test/<toolset>gcc/<toolset-gcc:version>4.4
-      basic-test/<toolset>gcc/<toolset-gcc:version>4.5
-    ;
-
-alias toolset-test-gcc-without-c++0x
-    : basic-test/<toolset>gcc/<toolset-gcc:version>4.2
-    ;
-
-alias c-std-test
-    : toolset-test/<c-std>c89
-      toolset-test/<c-std>c99
-      toolset-test/<c-std>c1x
-      toolset-test-gcc-without-c1x/<c-std>c89
-      toolset-test-gcc-without-c1x/<c-std>c99
-    ;
-
-alias c++-std-test
-    : c-std-test/<c++-std>c++98
-      c-std-test/<c++-std>c++0x
-      toolset-test-gcc-without-c++0x/<c-std>c89/<c++-std>c++98
-      toolset-test-gcc-without-c++0x/<c-std>c99/<c++-std>c++98
-    ;
+alias compilers-test : basic-test/$(FULL_COMPILERS_TEST:E=) ;
 
 alias stdlib-test
-    : c++-std-test/<stdlib>native
-      c++-std-test/<stdlib>stlport
+    : compilers-test/<stdlib>native
+      compilers-test/<stdlib>stlport
     ;
 
 alias variant-test
@@ -72,13 +47,10 @@ alias mega-test : link-test ;
 
 explicit
     use-backtrace
+    current-frame
     test-base
     basic-test
-    toolset-test
-    toolset-test-gcc-without-c1x
-    toolset-test-gcc-without-c++0x
-    c-std-test
-    c++-std-test
+    compilers-test
     stdlib-test
     variant-test
     launcher-test
