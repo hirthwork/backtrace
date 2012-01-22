@@ -130,12 +130,14 @@ int main()
     TMyStruct().Function();
 }
 
-Now compile and link this program using the following command gcc
-print-function.cpp -lbacktrace -lbacktracexx -rdynamic Launch the resulting
-binary. The output should be like the following: function: TMyStruct::Function()
-const So, what does this program doing? First of all, we calls GetCurrentFrame
-function, which obviously returns current frame information stored in
-TBacktraceRecord structure. This structure doesn’t perform symbol demangling, so
-we’re converting it to TDemangledBacktraceRecord. Now, the function name is
-available and can be printed to the standard output.
+Now compile and link this program using the following command:
+
+gcc print-function.cpp -lbacktrace -lbacktracexx -rdynamic
+
+Launch the resulting binary. The output should be like the following: function:
+TMyStruct::Function() const So, what does this program doing? First of all, we
+calls GetCurrentFrame function, which obviously returns current frame
+information stored in TBacktraceRecord structure. This structure doesn’t perform
+symbol demangling, so we’re converting it to TDemangledBacktraceRecord. Now, the
+function name is available and can be printed to the standard output.
 
