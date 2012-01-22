@@ -7,17 +7,17 @@ import noweb ;
 use-project /test-base : test-base ;
 
 unit-test print-function
-    : ../doc/README.nw ..//backtrace
+    : ../doc/README.nw /backtrace//backtracexx
     : <chunk>print-function.cpp <chunk-type>cpp
     ;
 
 unit-test use-backtrace
-    : ../doc/README.nw ..//backtrace
+    : ../doc/README.nw /backtrace//backtrace
     : <chunk>use-backtrace.c
     ;
 
 unit-test current-frame
-    : ../doc/README.nw ..//backtrace
+    : ../doc/README.nw /backtrace//backtrace
     : <chunk>current-frame.c
     ;
 

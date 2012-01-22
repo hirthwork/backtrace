@@ -103,7 +103,7 @@ Boost.Test is also required to be installed in order to execute tests.
 
 \section{Quick Example}
 
-Here the quick example that will print current function demangled name.
+Let's writes the quick example that will print current function demangled name.
 The brief description will be given later.
 
 <<print-function.cpp>>=
