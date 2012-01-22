@@ -1,12 +1,14 @@
-import feature : feature compose ;
+import feature ;
 import testing ;
 import c-std ;
 
-feature c-std-test : off on ;
+feature.feature c-std-test : off on ;
 
-feature testing-launcher : none valgrind : propagated composite ;
-compose <testing-launcher>valgrind
-    : <testing.launcher>"valgrind --leak-check=full --error-exitcode=1 --track-origins=yes -q --suppressions=tests/test-base/glibc.supp"
+feature.feature testing-launcher : none valgrind : propagated composite ;
+
+path-constant SUPPRESSIONS-FILE : glibc.supp ;
+feature.compose <testing-launcher>valgrind
+    : <testing.launcher>"valgrind --leak-check=full --error-exitcode=1 --track-origins=yes -q --suppressions=$(SUPPRESSIONS-FILE)"
     ;
 
 project

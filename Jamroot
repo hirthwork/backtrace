@@ -6,7 +6,6 @@ project
       <define>_GNU_SOURCE=1
       <stdlib>stlport:<define>_GLIBCXX_HAVE_WCSFTIME=1
       <cflags>-ansi <cxxflags>-ansi
-      <cflags>-pedantic-errors <cxxflags>-pedantic-errors
       <cflags>-Wextra <cxxflags>-Wextra
       <linkflags>-rdynamic
     ;
