@@ -181,7 +181,7 @@ allocated using [[malloc]], or [[NULL]] in case of failure.
 \subsubsection{Errors}
 \begin{description}
 \item[EDOM] Memory allocation failure occurred, this can be caused by very big
-value of [[initialDepth]] passed to function
+value of [[initialDepth]] passed to function.
 \item[ERANGE] [[offset]] passed to function is bigger that call stack depth, so,
 nothing can be returned.
 \end{description}

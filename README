@@ -1,32 +1,141 @@
 Backtrace helper library
-========================
 
-Introduction
-------------
-The purpose of this library is to provide easy way to current program call
-stack.
+Dmitry Potapov <potapov.d@gmail.com>
 
-Rationale
----------
-This library provides ability to retrieve current call stack with function
-demangling and "backtrace_symbols" strings parsing, so you can store this
-information in exception object.
+January 22, 2012
 
-Overview
---------
-The only thing you need to use backtrace helper is to include `backtrace.hpp`
-and link libbacktrace.so. After that you can retrieve current call stack by
-calling function `GetBacktrace`.
+Contents
+1 Introduction
+2 Rationale
+3 Installation
+3.1 Prerequisites
+3.2 Pure C library installation
+3.3 C++-library installation
+3.4 Other installation options
+3.4.1 Static library installation
+3.4.2 Debug version installation
+3.5 Sanity testing
+4 Quick Example
 
-Installation
-------------
-You require bjam (a.k.a. boost build) to install this package.
-In order to launch sanity test you need Boost.Test to be installed.
 
-  * In order to install, execute bjam with argument
-    `dist --includedir=<prefix>`, where `<prefix>` is the installation path
-    where library will be installed. More precisely, `reinvented-wheels`
-    subfolder will be created, containing all required headers.
-  * In order to launch the test, execute bjam with `-d0 test release` argument
-    and ensure that return code was 0.
+1 Introduction
+
+The purpose of this library is to provide APIs for current program call stack
+retrieval in handy and painless manner.
+
+
+2 Rationale
+
+Current backtrace implementations (glibc, libexecinfo) doesn’t provide
+functionality to retrieve whole backtrace at once. At the same time backtrace
+symbols prints symbol information in its own manner, which is not a part of any
+standard and can vary from one version to another. Backtrace helper library is
+intended to provide functions for complete backtrace retrieval with instant
+access to symbol and module name without strings parsing of any kind.
+
+
+3 Installation
+
+
+3.1 Prerequisites
+
+1. Linux or FreeBSD (I haven’t performed any testing on other *BSD systems, as
+   well as on any non-BSD Unix distribution)
+2. Boost.Build
+3. glibc (other libc implementations wasn’t tested yet)
+4. g++ (as Boost.Build uses g++ even for pure C targets build) or clang++
+
+
+3.2 Pure C library installation
+
+Change your current working directory to backtrace source distribution root
+and execute the following command:
+
+bjam /backtrace//backtrace-install release
+
+After this backtrace library will be built and installed among with required
+headers. The default installation preﬁx is /usr/local which can be overridden
+using --prefix=<installation path> option:
+
+bjam /backtrace//backtrace-install release --prefix=/usr
+
+
+3.3 C++-library installation
+
+Change your current working directory to backtrace source distribution root
+and execute the following command:
+
+bjam /backtrace//backtracexx-install release
+
+As with the pure C library installation, library and headers will be installed
+to /usr/local by default. Both pure C and C++ versions can be installed
+using the following command:
+
+bjam /backtrace//backtrace-install /backtrace//backtracexx-install release
+
+
+3.4 Other installation options
+
+
+3.4.1 Static library installation
+
+Backtrace can be built as static library by adding link=static option to bjam
+invocation command. It is possible to build and install static and shared
+libraries with single command:
+
+bjam /backtrace//backtracexx-install release link=static,shared
+
+
+3.4.2 Debug version installation
+
+Debug version of backtrace library can be installed by invoking installation
+command without specifying release build variant in command line:
+
+bjam /backtrace//backtrace-install
+
+
+3.5 Sanity testing
+
+In order to ensure that backtrace is sane on current environment, unit-tests
+can be used:
+bjam test
+In this case, unit-tests will be built, executed and their status will be
+reported. For most users it is enough to check the return code of the command
+speciﬁed above. As for most Linux utilities zero return code states for
+successful tests executions without failures. Boost.Test is also required to be
+installed in order to execute tests.
+
+
+4 Quick Example
+
+Here the quick example that will print current function demangled name. The
+brief description will be given later.
+print-function.cpp ≡
+#include <iostream>
+#include <backtrace/current-frame.hpp>
+#include <backtrace/record.h> // simple backtrace record
+#include <backtrace/record.hpp> // demangled backtrace record
+
+struct TMyStruct {
+    void Function() const {
+        using namespace NBacktrace;
+        TBacktraceRecord record(GetCurrentFrame());
+        TDemangledBacktraceRecord demangledRecord(record);
+        std::cout << "function: " << demangledRecord.Function_ << std::endl;
+    }
+};
+
+int main()
+{
+    TMyStruct().Function();
+}
+
+Now compile and link this program using the following command gcc
+print-function.cpp -lbacktrace -lbacktracexx -rdynamic Launch the resulting
+binary. The output should be like the following: function: TMyStruct::Function()
+const So, what does this program doing? First of all, we calls GetCurrentFrame
+function, which obviously returns current frame information stored in
+TBacktraceRecord structure. This structure doesn’t perform symbol demangling, so
+we’re converting it to TDemangledBacktraceRecord. Now, the function name is
+available and can be printed to the standard output.
 
